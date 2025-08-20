@@ -304,6 +304,20 @@
     </div>
 
 <script>
+	// Firebase configuration
+        const firebaseConfig = {
+                apiKey: "AIzaSyCCNhqRfWuHoRmaBUsGNYY_kDjygsIkUMQ",
+                authDomain: "climateyanga.firebaseapp.com",
+                projectId: "climateyanga",
+                storageBucket: "climateyanga.firebasestorage.app",
+                messagingSenderId: "1061123944259",
+                appId: "1:1061123944259:web:d20f0d45c7ff925185c9f6"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
     // Check auth status
     auth.onAuthStateChanged((user) => {
         const userStatus = document.getElementById('userStatus');
