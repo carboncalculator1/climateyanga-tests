@@ -59,7 +59,6 @@ async function saveCalculation(calculationData, type) {
         return true;
     } catch (error) {
         console.error('Error saving calculation:', error);
-        alert('Failed to save calculation. Please try again.');
         return false;
     }
 }
@@ -329,6 +328,7 @@ async function exportToPDF() {
     // Save the PDF
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
