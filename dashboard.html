@@ -1,0 +1,77 @@
+<!-- dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Carbon Calculator Yanga</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1><i class="fas fa-leaf"></i> Carbon Calculator Yanga</h1>
+            <div class="user-menu">
+                <span id="userWelcome">Welcome, User!</span>
+                <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </header>
+        
+        <div class="dashboard-content">
+            <div class="stats-card">
+                <h2>Your Carbon Footprint Summary</h2>
+                <div class="total-emissions">
+                    <span id="totalEmissionsValue">0</span>
+                    <span>kg CO₂e Total</span>
+                </div>
+                <p>Based on your calculation history</p>
+            </div>
+            
+            <div class="actions-card">
+                <h2>Quick Actions</h2>
+                <a href="index.html" class="action-btn">
+                    <i class="fas fa-calculator"></i>
+                    <span>New Calculation</span>
+                </a>
+                <button id="viewHistoryBtn" class="action-btn">
+                    <i class="fas fa-history"></i>
+                    <span>View History</span>
+                </button>
+            </div>
+            
+            <div class="history-card" id="historySection" style="display: none;">
+                <h2>Calculation History</h2>
+                <div id="calculationsList" class="calculations-list">
+                    <!-- Calculation history will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase configuration (same as before)
+        const firebaseConfig = {
+                apiKey: "AIzaSyCCNhqRfWuHoRmaBUsGNYY_kDjygsIkUMQ",
+                authDomain: "climateyanga.firebaseapp.com",
+                projectId: "climateyanga",
+                storageBucket: "climateyanga.firebasestorage.app",
+                messagingSenderId: "1061123944259",
+                appId: "1:1061123944259:web:d20f0d45c7ff925185c9f6"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
+    
+    <script src="dashboard.js"></script>
+</body>
+</html>
