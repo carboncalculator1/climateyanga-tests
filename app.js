@@ -65,7 +65,7 @@ async function saveCalculation(calculationData, type) {
 }
 
 
-    function calculatePersonal() {
+   async function calculatePersonal() {
         const inputs = {
             commute: parseFloat(document.getElementById('commuteValue').textContent),
             waste: parseFloat(document.getElementById('wasteValue').textContent),
@@ -95,7 +95,7 @@ async function saveCalculation(calculationData, type) {
 
     }
 
-    function calculateConstruction() {
+   async function calculateConstruction() {
         const inputs = {
             embodiedCarbon: parseFloat(document.getElementById('embodiedCarbonValue').textContent),
             constructionElectricity: parseFloat(document.getElementById('constructionElectricityValue').textContent),
@@ -127,7 +127,7 @@ results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
         displayResults(results);
     }
 
-    function calculateManufacturing() {
+   async function calculateManufacturing() {
         const inputs = {
             rawMaterial: parseFloat(document.getElementById('rawMaterialValue').textContent),
             manufacturingEnergy: parseFloat(document.getElementById('manufacturingEnergyValue').textContent),
@@ -329,5 +329,6 @@ async function exportToPDF() {
     // Save the PDF
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
