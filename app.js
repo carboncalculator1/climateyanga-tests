@@ -266,92 +266,106 @@ results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
     }
 
 // PDF export function
-// PDF export function
 async function exportToPDF() {
-    const user = auth.currentUser;
-    if (!user) {
-        if (confirm('You need to be logged in to export PDF. Would you like to login now?')) {
-            window.location.href = 'login.html';
-        }
-        return;
+  const user = auth.currentUser;
+  if (!user) {
+    if (confirm('You need to be logged in to export PDF. Would you like to login now?')) {
+      window.location.href = 'login.html';
     }
+    return;
+  }
 
-    // Get user data for filename
-    const userDoc = await db.collection('users').doc(user.uid).get();
-    const userData = userDoc.data();
-    const username = userData.username || user.email.split('@')[0];
+  const userDoc = await db.collection('users').doc(user.uid).get();
+  const userData = userDoc.data();
+  const username = userData?.username || user.email.split('@')[0];
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-    // ==== HEADER BAR ====
-    doc.setFillColor(0, 128, 0); // green background
-    doc.rect(0, 0, 210, 20, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("Carbon Emissions Summary", 105, 13, { align: "center" });
+  // Header bar
+  doc.setFillColor(0, 128, 0);
+  doc.rect(0, 0, 210, 20, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text("Carbon Emissions Summary", 105, 13, { align: "center" });
 
-    // ==== USER INFO ====
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-    doc.text(`User: ${username}`, 10, 30);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 37);
+  // User info
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.text(`User: ${username}`, 10, 30);
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 37);
 
-    // ==== CALCULATION DETAILS BOX ====
-    let y = 50;
-    doc.setDrawColor(0, 0, 0);
-    doc.setLineWidth(0.3);
+  // Helpers
+  const startY = 50;
+  const lineH = 6;
+  const labelize = k =>
+    k.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ')
+     .replace(/\b\w/g, c => c.toUpperCase());
 
-    // Title above box
-    doc.setFont("helvetica", "bold");
-    doc.text("Calculation Details", 12, y - 5);
+  // Split calculationData into inputs/results
+  const entries = Object.entries(calculationData).filter(([,v]) => typeof v === "number");
+  const inputsOnly  = entries.filter(([k]) => k === k.toLowerCase() && k !== "total");
+  const resultsOnly = entries.filter(([k]) => k !== "total" && k[0] === k[0].toUpperCase());
 
-    // Outer big box
-    doc.rect(10, y, 190, 70);
+  // Dynamic heights
+  const inputsHeight  = Math.max(30, 10 + inputsOnly.length * lineH + 8); // header + rows + padding
+  const summaryHeader = 10;
+  const resultsHeight = Math.max(20, 8 + resultsOnly.length * lineH + 8);
+  const outerHeight   = inputsHeight + summaryHeader + resultsHeight;
 
-    // Inputs section
-    doc.rect(10, y, 190, 30);
-    doc.setFont("helvetica", "normal");
-    doc.text("Inputs:", 12, y + 7);
+  // Title
+  doc.setFont("helvetica", "bold");
+  doc.text("Calculation Details", 12, startY - 5);
 
-    let innerY = y + 15;
-    for (const [key, value] of Object.entries(calculationData)) {
-        if (typeof value === "number" && key !== "total") {
-            doc.text(`${key}: ${value.toFixed(2)}`, 20, innerY);
-            innerY += 6;
-        }
-    }
+  // Outer box
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.3);
+  doc.rect(10, startY, 190, outerHeight);
 
-    // Summary section
-    doc.text("Summary (results):", 12, y + 37);
+  // Inputs sub-box (top portion)
+  doc.rect(10, startY, 190, inputsHeight);
+  doc.setFont("helvetica", "normal");
+  doc.text("Inputs:", 12, startY + 7);
 
-    let resultY = y + 45;
-    for (const [key, value] of Object.entries(calculationData)) {
-        if (typeof value === "number" && key !== "total" && key[0] === key[0].toUpperCase()) { 
-            // only results (capitalized keys)
-            doc.text(`${key}: ${value.toFixed(2)} kg CO₂e/month`, 20, resultY);
-            resultY += 6;
-        }
-    }
+  let y = startY + 15;
+  inputsOnly.forEach(([k, v]) => {
+    doc.text(`${labelize(k)}: ${Number(v).toFixed(2)}`, 20, y);
+    y += lineH;
+  });
 
-    // ==== TOTAL EMISSIONS ====
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(255, 0, 0);
-    doc.text(
-        `Total Emissions yearly: ${calculationData.total.toFixed(2)} kg CO₂e/Year`,
-        12,
-        y + 85
-    );
+  // Summary (results) header and rows
+  const summaryY = startY + inputsHeight;
+  doc.text("Summary (results):", 12, summaryY + 7);
 
-    // ==== FOOTER ====
-    doc.setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text("A climate awareness and action initiative by:", 10, 290);
-    doc.setTextColor(0, 128, 0);
-    doc.text("Carbon Calculator Yanga Foundation, © 2025", 105, 290, { align: "center" });
+  y = summaryY + 15;
+  resultsOnly.forEach(([k, v]) => {
+    doc.text(`${k}: ${Number(v).toFixed(2)} kg CO₂e/month`, 20, y);
+    y += lineH;
+  });
 
-    // Save PDF
-    doc.save(`${username}_emissions_summary.pdf`);
+  // Total emissions (yearly, in kg and tonnes)
+  const monthlyTotal = Number(calculationData.total || 0);
+  const annualKg = monthlyTotal * 12;
+  const annualTonnes = annualKg / 1000;
+
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(255, 0, 0);
+  doc.text(
+    `Total Emissions yearly: ${annualKg.toFixed(2)} kg  (${annualTonnes.toFixed(2)} t) CO₂e/Year`,
+    12,
+    startY + outerHeight + 12
+  );
+
+  // Footer
+  doc.setFontSize(9);
+  doc.setTextColor(0, 0, 0);
+  doc.text("A climate awareness and action initiative by:", 10, 290);
+  doc.setTextColor(0, 128, 0);
+  doc.text("Carbon Calculator Yanga Foundation, © 2025", 105, 290, { align: "center" });
+
+  doc.save(`${username}_emissions_summary.pdf`);
 }
+
+
