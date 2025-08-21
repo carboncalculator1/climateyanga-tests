@@ -32,7 +32,7 @@
         return true;
     }
 //save to firestore
-async function saveCalculation(calculationData, type) {
+async function saveCalculation(inputs, results, type) {
     try {
         const user = auth.currentUser;
         if (!user) {
@@ -42,11 +42,11 @@ async function saveCalculation(calculationData, type) {
             return false;
         }
         
-        // Prepare calculation object
+        // Prepare calculation object with separate inputs and results
         const calculation = {
             type: type,
-            inputs: calculationData,
-            results: calculationData,
+            inputs: inputs,      // Store only the inputs
+            results: results,    // Store only the results
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         };
         
@@ -84,7 +84,7 @@ async function saveCalculation(calculationData, type) {
         results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
         calculationData = { ...inputs, ...results };
 	// After calculation
-    	const saved = await saveCalculation({...inputs, ...results}, 'personal');
+    	const saved = await saveCalculation(inputs, results, 'personal');
     	if (saved) {
         	alert('Calculation saved successfully!');
     	}
@@ -117,7 +117,7 @@ results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
         calculationData = { ...inputs, ...results };
 	
 	// After calculation
-    	const saved = await saveCalculation({...inputs, ...results}, 'construction');
+    	const saved = await saveCalculation(inputs, results, 'construction');
     	if (saved) {
         	alert('Calculation saved successfully!');
     	}
@@ -149,7 +149,7 @@ results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
         calculationData = { ...inputs, ...results };
 
     		// After calculation
-    		const saved = await saveCalculation({...inputs, ...results}, 'manufacturing');
+    		const saved = await saveCalculation(inputs, results, 'manufacturing');
     		if (saved) {
         		alert('Calculation saved successfully!');
     		}
@@ -327,6 +327,7 @@ async function exportToPDF() {
     // Save the PDF
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
