@@ -36,7 +36,6 @@ async function saveCalculation(calculationData, type) {
     try {
         const user = auth.currentUser;
         if (!user) {
-            // If user is not logged in, redirect to login page
             if (confirm('You need to be logged in to save calculations. Would you like to login now?')) {
                 window.location.href = 'login.html';
             }
@@ -51,10 +50,10 @@ async function saveCalculation(calculationData, type) {
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         };
         
-        // Add calculation to user's document
-        await db.collection('users').doc(user.uid).update({
-            calculations: firebase.firestore.FieldValue.arrayUnion(calculation)
-        });
+        // Add calculation to user's calculations subcollection
+        await db.collection('users').doc(user.uid)
+                .collection('calculations')
+                .add(calculation);
         
         return true;
     } catch (error) {
@@ -328,6 +327,7 @@ async function exportToPDF() {
     // Save the PDF
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
