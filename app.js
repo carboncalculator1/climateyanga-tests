@@ -320,8 +320,7 @@ async function exportToPDF() {
         }
     }
 
-    // Summary section
-    doc.text("Summary (results):", 12, y + 35);
+
 
     // ==== TOTAL EMISSIONS ====
     doc.setFont("helvetica", "bold");
@@ -346,6 +345,7 @@ async function exportToPDF() {
     // Save PDF
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
