@@ -271,51 +271,81 @@ async function exportToPDF() {
         }
         return;
     }
-    
-    // Get user data for filename
+
     const userDoc = await db.collection('users').doc(user.uid).get();
     const userData = userDoc.data();
     const username = userData.username || user.email.split('@')[0];
-    
-    // Create PDF content
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    
-    // Add title
-    doc.setFontSize(20);
-    doc.text('Carbon Emissions Summary', 105, 15, { align: 'center' });
-    
-    // Add user info
-    doc.setFontSize(12);
-    doc.text(`User: ${userData.username || user.email}`, 20, 25);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 32);
-    
-    // Add calculation summary
-    let yPosition = 45;
+
+    // === HEADER BAR ===
+    doc.setFillColor(0, 153, 51); // Green
+    doc.rect(0, 0, 210, 15, 'F'); // full-width top bar
+    doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
-    doc.text('Calculation Details', 20, yPosition);
-    yPosition += 10;
-    
+    doc.text('Carbon Emissions Summary', 105, 10, { align: 'center' });
+
+    // === USER INFO ===
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.text(`User: ${username}`, 10, 25);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 31);
+
+    // === CALCULATION DETAILS BOX ===
     doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.rect(10, 40, 190, 100); // outer box
+    doc.line(10, 50, 200, 50); // line after header
+    doc.text('Calculation Details', 12, 47);
+
+    // Inputs
+    doc.setFont(undefined, 'normal');
+    doc.text('Inputs:', 12, 57);
+    let y = 65;
     for (const [key, value] of Object.entries(calculationData)) {
+        if (['total'].includes(key)) continue; // skip totals here
         if (typeof value === 'number') {
-            doc.text(`${key}: ${value.toFixed(2)}`, 20, yPosition);
-            yPosition += 7;
-            
-            // Add new page if needed
-            if (yPosition > 270) {
-                doc.addPage();
-                yPosition = 20;
-            }
+            doc.text(`${key}: ${value.toFixed(2)}`, 20, y);
+            y += 7;
         }
     }
-    
-    // Add total
-    yPosition += 7;
-    doc.setFontSize(14);
-    doc.text(`Total Emissions: ${calculationData.total.toFixed(2)} kg CO₂e`, 20, yPosition);
-    
-    // Save the PDF
+
+    // Results section
+    y += 5;
+    doc.setFont(undefined, 'bold');
+    doc.text('Summary (results):', 12, y);
+    y += 8;
+    doc.setFont(undefined, 'normal');
+
+    for (const [key, value] of Object.entries(calculationData)) {
+        if (key === 'total') continue;
+        if (typeof value === 'number') {
+            doc.text(`${key}: ${value.toFixed(2)} kg CO₂e/month`, 20, y);
+            y += 7;
+        }
+    }
+
+    // === TOTAL EMISSIONS ===
+    y += 10;
+    doc.setTextColor(255, 0, 0); // red text
+    doc.setFontSize(12);
+    doc.text(
+        `Total Emissions yearly: ${ (calculationData.total * 12).toFixed(2) } kg CO₂e/Year`,
+        12,
+        y
+    );
+
+    // === FOOTER ===
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(8);
+    doc.text(
+        'A climate awareness and action initiative by: Carbon Calculator Yanga Foundation, © 2025',
+        105,
+        290,
+        { align: 'center' }
+    );
+
+    // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
-
