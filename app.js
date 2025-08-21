@@ -85,9 +85,7 @@ async function saveCalculation(inputs, results, type) {
         calculationData = { ...inputs, ...results };
 	// After calculation
     	const saved = await saveCalculation(inputs, results, 'personal');
-    	if (saved) {
-        	alert('Calculation saved successfully!');
-    	}
+    	
 
         displayResults(results);
 
@@ -118,9 +116,7 @@ results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
 	
 	// After calculation
     	const saved = await saveCalculation(inputs, results, 'construction');
-    	if (saved) {
-        	alert('Calculation saved successfully!');
-    	}
+    	
 
         displayResults(results);
     }
@@ -150,9 +146,7 @@ results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
 
     		// After calculation
     		const saved = await saveCalculation(inputs, results, 'manufacturing');
-    		if (saved) {
-        		alert('Calculation saved successfully!');
-    		}
+    		
 
         displayResults(results);
     }
@@ -327,6 +321,7 @@ async function exportToPDF() {
     // Save the PDF
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
