@@ -14,19 +14,17 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('userWelcome').textContent = `Welcome, ${userData.username || user.email}!`;
 
         // Add admin link if user is admin
-        if (userData.isAdmin) {
-        const adminLink = document.createElement('a');
-        adminLink.href = 'admin.html';
-        adminLink.textContent = 'Admin Panel';
-        adminLink.className = 'admin-link';
-    
-        // Add some styling (optional)
-        adminLink.style.marginLeft = "10px";
-        adminLink.style.fontWeight = "bold";
-    
-        // Append inside the user menu
-        document.querySelector('.user-menu').appendChild(adminLink);
-    }
+       if (userData.isAdmin) {
+                    const adminLink = document.createElement('a');
+                    adminLink.href = 'admin.html';
+                    adminLink.textContent = 'Admin Panel';
+                    adminLink.className = 'admin-link';
+                    adminLink.innerHTML = '<i class="fas fa-cog"></i> Admin Panel';
+                    
+                    // Insert before logout button
+                    const logoutBtn = document.getElementById('logoutBtn');
+                    logoutBtn.parentNode.insertBefore(adminLink, logoutBtn);
+                }
         
         // Load calculation history from subcollection
         await loadCalculationHistory(user.uid, userData);
