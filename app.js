@@ -53,7 +53,7 @@ async function saveCalculation(calculationData, type) {
         
         // Add calculation to user's document
         await db.collection('users').doc(user.uid).update({
-            calculations: firebase.firestore.FieldValue.arrayUnion(calculation)
+            calculations: firebase.firestore.FieldValue.arrayUnion(calculations)
         });
         
         return true;
@@ -328,6 +328,7 @@ async function exportToPDF() {
     // Save the PDF
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
