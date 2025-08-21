@@ -266,6 +266,7 @@ results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
     }
 
 // PDF export function
+// PDF export function
 async function exportToPDF() {
     const user = auth.currentUser;
     if (!user) {
@@ -285,7 +286,7 @@ async function exportToPDF() {
 
     // ==== HEADER BAR ====
     doc.setFillColor(0, 128, 0); // green background
-    doc.rect(0, 0, 210, 20, "F"); 
+    doc.rect(0, 0, 210, 20, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
@@ -303,12 +304,15 @@ async function exportToPDF() {
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.3);
 
-    // Outer box
-    doc.rect(10, y, 190, 60);  
-    // Inputs section
-    doc.rect(10, y, 190, 25);  
+    // Title above box
     doc.setFont("helvetica", "bold");
     doc.text("Calculation Details", 12, y - 5);
+
+    // Outer big box
+    doc.rect(10, y, 190, 70);
+
+    // Inputs section
+    doc.rect(10, y, 190, 30);
     doc.setFont("helvetica", "normal");
     doc.text("Inputs:", 12, y + 7);
 
@@ -320,7 +324,17 @@ async function exportToPDF() {
         }
     }
 
+    // Summary section
+    doc.text("Summary (results):", 12, y + 37);
 
+    let resultY = y + 45;
+    for (const [key, value] of Object.entries(calculationData)) {
+        if (typeof value === "number" && key !== "total" && key[0] === key[0].toUpperCase()) { 
+            // only results (capitalized keys)
+            doc.text(`${key}: ${value.toFixed(2)} kg CO₂e/month`, 20, resultY);
+            resultY += 6;
+        }
+    }
 
     // ==== TOTAL EMISSIONS ====
     doc.setFont("helvetica", "bold");
@@ -328,31 +342,16 @@ async function exportToPDF() {
     doc.text(
         `Total Emissions yearly: ${calculationData.total.toFixed(2)} kg CO₂e/Year`,
         12,
-        y + 75
+        y + 85
     );
 
     // ==== FOOTER ====
     doc.setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(
-        "A climate awareness and action initiative by: ",
-        10,
-        290
-    );
+    doc.text("A climate awareness and action initiative by:", 10, 290);
     doc.setTextColor(0, 128, 0);
     doc.text("Carbon Calculator Yanga Foundation, © 2025", 105, 290, { align: "center" });
 
     // Save PDF
     doc.save(`${username}_emissions_summary.pdf`);
 }
-
-
-
-
-
-
-
-
-
-
-
