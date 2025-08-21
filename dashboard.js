@@ -12,6 +12,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const userDoc = await db.collection('users').doc(user.uid).get();
         const userData = userDoc.data();
         document.getElementById('userWelcome').textContent = `Welcome, ${userData.username || user.email}!`;
+
+        // Add admin link if user is admin
+        if (userData.isAdmin) {
+        const adminLink = document.createElement('a');
+        adminLink.href = 'admin.html';
+        adminLink.textContent = 'Admin Panel';
+        adminLink.className = 'admin-link';
+    
+        // Add some styling (optional)
+        adminLink.style.marginLeft = "10px";
+        adminLink.style.fontWeight = "bold";
+    
+        // Append inside the user menu
+        document.querySelector('.user-menu').appendChild(adminLink);
+    }
         
         // Load calculation history from subcollection
         await loadCalculationHistory(user.uid, userData);
