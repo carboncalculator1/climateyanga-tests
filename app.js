@@ -36,9 +36,6 @@ async function saveCalculation(inputs, results, type) {
     try {
         const user = auth.currentUser;
         if (!user) {
-            if (confirm('You need to be logged in to save calculations. Would you like to login now?')) {
-                window.location.href = 'login.html';
-            }
             return false;
         }
         
@@ -321,3 +318,4 @@ async function exportToPDF() {
     // Save the PDF
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
