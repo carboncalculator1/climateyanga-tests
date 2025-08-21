@@ -1,11 +1,254 @@
-<!-- dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Carbon Calculator Yanga</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #2c974b, #1e6b33);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logout-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .admin-link {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .admin-link:hover {
+            background-color: #ff5252;
+        }
+        
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .stats-card, .actions-card, .history-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stats-card h2, .actions-card h2, .history-card h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .total-emissions {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        #totalEmissionsValue {
+            font-size: 48px;
+            font-weight: 700;
+            color: #2c974b;
+            display: block;
+        }
+        
+        .actions-card {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .action-btn:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .calculations-list {
+            margin-top: 20px;
+        }
+        
+        .calculation-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2c974b;
+        }
+        
+        .calc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .calc-header h3 {
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .calc-date {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .calc-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .view-details-btn {
+            background-color: #2c974b;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .view-details-btn:hover {
+            background-color: #228b22;
+        }
+        
+        .calc-details {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .calc-details h4 {
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .calc-details pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .no-data {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .user-menu {
+                flex-direction: column;
+            }
+            
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .calc-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .calc-summary {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -15,6 +258,7 @@
             <h1><i class="fas fa-leaf"></i> Carbon Calculator Yanga</h1>
             <div class="user-menu">
                 <span id="userWelcome">Welcome, User!</span>
+                <!-- Admin link will be inserted here if user is admin -->
                 <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </header>
@@ -56,22 +300,154 @@
     <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // Firebase configuration (same as before)
+        // Firebase configuration
         const firebaseConfig = {
-                apiKey: "AIzaSyCCNhqRfWuHoRmaBUsGNYY_kDjygsIkUMQ",
-                authDomain: "climateyanga.firebaseapp.com",
-                projectId: "climateyanga",
-                storageBucket: "climateyanga.firebasestorage.app",
-                messagingSenderId: "1061123944259",
-                appId: "1:1061123944259:web:d20f0d45c7ff925185c9f6"
+            apiKey: "AIzaSyCCNhqRfWuHoRmaBUsGNYY_kDjygsIkUMQ",
+            authDomain: "climateyanga.firebaseapp.com",
+            projectId: "climateyanga",
+            storageBucket: "climateyanga.firebasestorage.app",
+            messagingSenderId: "1061123944259",
+            appId: "1:1061123944259:web:d20f0d45c7ff925185c9f6"
         };
         
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        
+        // Dashboard functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            auth.onAuthStateChanged(async (user) => {
+                if (!user) {
+                    // Redirect to login if not authenticated
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Display user info
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                const userData = userDoc.data();
+                document.getElementById('userWelcome').textContent = `Welcome, ${userData.username || user.email}!`;
+                
+                // Add admin link if user is admin
+                if (userData.isAdmin) {
+                    const adminLink = document.createElement('a');
+                    adminLink.href = 'admin.html';
+                    adminLink.textContent = 'Admin Panel';
+                    adminLink.className = 'admin-link';
+                    adminLink.innerHTML = '<i class="fas fa-cog"></i> Admin Panel';
+                    
+                    // Insert before logout button
+                    const logoutBtn = document.getElementById('logoutBtn');
+                    logoutBtn.parentNode.insertBefore(adminLink, logoutBtn);
+                }
+                
+                // Load calculation history from subcollection
+                await loadCalculationHistory(user.uid, userData);
+                
+                // Set up logout button
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    auth.signOut().then(() => {
+                        window.location.href = 'login.html';
+                    });
+                });
+                
+                // Toggle history view
+                document.getElementById('viewHistoryBtn').addEventListener('click', () => {
+                    const historySection = document.getElementById('historySection');
+                    if (historySection.style.display === 'none') {
+                        historySection.style.display = 'block';
+                    } else {
+                        historySection.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        async function loadCalculationHistory(userId, userData) {
+            const calculationsList = document.getElementById('calculationsList');
+            const totalEmissionsValue = document.getElementById('totalEmissionsValue');
+            
+            try {
+                // Get calculations from the subcollection
+                const snapshot = await db.collection('users').doc(userId)
+                    .collection('calculations')
+                    .orderBy('timestamp', 'desc')
+                    .get();
+                
+                if (snapshot.empty) {
+                    calculationsList.innerHTML = '<p class="no-data">No calculations yet. Start by creating a new calculation!</p>';
+                    totalEmissionsValue.textContent = '0';
+                    return;
+                }
+                
+                // Calculate total emissions and prepare calculations array
+                let totalEmissions = 0;
+                const calculations = [];
+                
+                snapshot.forEach(doc => {
+                    const calc = { id: doc.id, ...doc.data() };
+                    calculations.push(calc);
+                    totalEmissions += calc.results.total || 0;
+                });
+                
+                totalEmissionsValue.textContent = totalEmissions.toFixed(1);
+                
+                // Display calculation history
+                calculationsList.innerHTML = '';
+                calculations.forEach((calc, index) => {
+                    const calcElement = document.createElement('div');
+                    calcElement.className = 'calculation-item';
+                    
+                    // Format timestamp
+                    let timestampText = 'Date not available';
+                    if (calc.timestamp && calc.timestamp.toDate) {
+                        timestampText = new Date(calc.timestamp.toDate()).toLocaleDateString();
+                    } else if (calc.timestamp) {
+                        timestampText = new Date(calc.timestamp).toLocaleDateString();
+                    }
+                    
+                    calcElement.innerHTML = `
+                        <div class="calc-header">
+                            <h3>${calc.type.charAt(0).toUpperCase() + calc.type.slice(1)} Calculation</h3>
+                            <span class="calc-date">${timestampText}</span>
+                        </div>
+                        <div class="calc-summary">
+                            <p>Total: <strong>${calc.results.total.toFixed(1)} kg CO₂e</strong></p>
+                            <button class="view-details-btn" data-index="${index}">View Details</button>
+                        </div>
+                        <div class="calc-details" id="details-${index}" style="display: none;">
+                            <h4>Inputs:</h4>
+                            <pre>${JSON.stringify(calc.inputs, null, 2)}</pre>
+                            <h4>Results:</h4>
+                            <pre>${JSON.stringify(calc.results, null, 2)}</pre>
+                        </div>
+                    `;
+                    calculationsList.appendChild(calcElement);
+                });
+                
+                // Add event listeners to view details buttons
+                document.querySelectorAll('.view-details-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const index = btn.getAttribute('data-index');
+                        const detailsElement = document.getElementById(`details-${index}`);
+                        if (detailsElement.style.display === 'none') {
+                            detailsElement.style.display = 'block';
+                            btn.textContent = 'Hide Details';
+                        } else {
+                            detailsElement.style.display = 'none';
+                            btn.textContent = 'View Details';
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Error loading calculation history:', error);
+                calculationsList.innerHTML = '<p class="no-data">Error loading calculations. Please try again.</p>';
+                totalEmissionsValue.textContent = '0';
+            }
+        }
     </script>
-    
-    <script src="dashboard.js"></script>
 </body>
 </html>
