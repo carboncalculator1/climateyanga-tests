@@ -267,105 +267,57 @@ results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
 
 // PDF export function
 async function exportToPDF() {
-  const user = auth.currentUser;
-  if (!user) {
-    if (confirm('You need to be logged in to export PDF. Would you like to login now?')) {
-      window.location.href = 'login.html';
+    const user = auth.currentUser;
+    if (!user) {
+        if (confirm('You need to be logged in to export PDF. Would you like to login now?')) {
+            window.location.href = 'login.html';
+        }
+        return;
     }
-    return;
-  }
-
-  const userDoc = await db.collection('users').doc(user.uid).get();
-  const userData = userDoc.data();
-  const username = userData?.username || user.email.split('@')[0];
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  // Header bar
-  doc.setFillColor(0, 128, 0);
-  doc.rect(0, 0, 210, 20, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.text("Carbon Emissions Summary", 105, 13, { align: "center" });
-
-  // User info
-  doc.setTextColor(0, 0, 0);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.text(`User: ${username}`, 10, 30);
-  doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 37);
-
-  // Helpers
-  const startY = 50;
-  const lineH = 6;
-  const labelize = k =>
-    k.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ')
-     .replace(/\b\w/g, c => c.toUpperCase());
-
-  // Split calculationData into inputs/results
-  const entries = Object.entries(calculationData).filter(([,v]) => typeof v === "number");
-  const inputsOnly  = entries.filter(([k]) => k === k.toLowerCase() && k !== "total");
-  const resultsOnly = entries.filter(([k]) => k !== "total" && k[0] === k[0].toUpperCase());
-
-  // Dynamic heights
-  const inputsHeight  = Math.max(30, 10 + inputsOnly.length * lineH + 8); // header + rows + padding
-  const summaryHeader = 10;
-  const resultsHeight = Math.max(20, 8 + resultsOnly.length * lineH + 8);
-  const outerHeight   = inputsHeight + summaryHeader + resultsHeight;
-
-  // Title
-  doc.setFont("helvetica", "bold");
-  doc.text("Calculation Details", 12, startY - 5);
-
-  // Outer box
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.3);
-  doc.rect(10, startY, 190, outerHeight);
-
-  // Inputs sub-box (top portion)
-  doc.rect(10, startY, 190, inputsHeight);
-  doc.setFont("helvetica", "normal");
-  doc.text("Inputs:", 12, startY + 7);
-
-  let y = startY + 15;
-  inputsOnly.forEach(([k, v]) => {
-    doc.text(`${labelize(k)}: ${Number(v).toFixed(2)}`, 20, y);
-    y += lineH;
-  });
-
-  // Summary (results) header and rows
-  const summaryY = startY + inputsHeight;
-  doc.text("Summary (results):", 12, summaryY + 7);
-
-  y = summaryY + 15;
-  resultsOnly.forEach(([k, v]) => {
-    doc.text(`${k}: ${Number(v).toFixed(2)} kg CO₂e/month`, 20, y);
-    y += lineH;
-  });
-
-  // Total emissions (yearly, in kg and tonnes)
-  const monthlyTotal = Number(calculationData.total || 0);
-  const annualKg = monthlyTotal * 12;
-  const annualTonnes = annualKg / 1000;
-
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(255, 0, 0);
-  doc.text(
-    `Total Emissions yearly: ${annualKg.toFixed(2)} kg  (${annualTonnes.toFixed(2)} t) CO₂e/Year`,
-    12,
-    startY + outerHeight + 12
-  );
-
-  // Footer
-  doc.setFontSize(9);
-  doc.setTextColor(0, 0, 0);
-  doc.text("A climate awareness and action initiative by:", 10, 290);
-  doc.setTextColor(0, 128, 0);
-  doc.text("Carbon Calculator Yanga Foundation, © 2025", 105, 290, { align: "center" });
-
-  doc.save(`${username}_emissions_summary.pdf`);
+    
+    // Get user data for filename
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    const userData = userDoc.data();
+    const username = userData.username || user.email.split('@')[0];
+    
+    // Create PDF content
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text('Carbon Emissions Summary', 105, 15, { align: 'center' });
+    
+    // Add user info
+    doc.setFontSize(12);
+    doc.text(`User: ${userData.username || user.email}`, 20, 25);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 32);
+    
+    // Add calculation summary
+    let yPosition = 45;
+    doc.setFontSize(16);
+    doc.text('Calculation Details', 20, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(12);
+    for (const [key, value] of Object.entries(calculationData)) {
+        if (typeof value === 'number') {
+            doc.text(`${key}: ${value.toFixed(2)}`, 20, yPosition);
+            yPosition += 7;
+            
+            // Add new page if needed
+            if (yPosition > 270) {
+                doc.addPage();
+                yPosition = 20;
+            }
+        }
+    }
+    
+    // Add total
+    yPosition += 7;
+    doc.setFontSize(14);
+    doc.text(`Total Emissions: ${calculationData.total.toFixed(2)} kg CO₂e`, 20, yPosition);
+    
+    // Save the PDF
+    doc.save(`${username}_emissions_summary.pdf`);
 }
-
-
