@@ -274,53 +274,92 @@ async function exportToPDF() {
         }
         return;
     }
-    
+
     // Get user data for filename
     const userDoc = await db.collection('users').doc(user.uid).get();
     const userData = userDoc.data();
     const username = userData.username || user.email.split('@')[0];
-    
-    // Create PDF content
+
+    // Create PDF
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    
-    // Add title
-    doc.setFontSize(20);
-    doc.text('Carbon Emissions Summary', 105, 15, { align: 'center' });
-    
-    // Add user info
-    doc.setFontSize(12);
-    doc.text(`User: ${userData.username || user.email}`, 20, 25);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 32);
-    
-    // Add calculation summary
-    let yPosition = 45;
-    doc.setFontSize(16);
-    doc.text('Calculation Details', 20, yPosition);
-    yPosition += 10;
-    
-    doc.setFontSize(12);
-    for (const [key, value] of Object.entries(calculationData)) {
-        if (typeof value === 'number') {
-            doc.text(`${key}: ${value.toFixed(2)}`, 20, yPosition);
-            yPosition += 7;
-            
-            // Add new page if needed
-            if (yPosition > 270) {
-                doc.addPage();
-                yPosition = 20;
-            }
-        }
-    }
-    
-    // Add total
-    yPosition += 7;
+
+    // === Header bar ===
+    doc.setFillColor(0, 128, 0); // green
+    doc.rect(0, 0, 210, 20, "F"); // full width rectangle
+    doc.setTextColor(255, 255, 255);
     doc.setFontSize(14);
-    doc.text(`Total Emissions: ${calculationData.total.toFixed(2)} kg CO₂e`, 20, yPosition);
-    
+    doc.setFont("helvetica", "bold");
+    doc.text("Carbon Emissions Summary", 105, 13, { align: "center" });
+
+    // === User info ===
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`User: ${username}`, 20, 28);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 34);
+
+    // === Box for Calculation Details ===
+    let y = 45;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.rect(15, y, 180, 90); // big box
+    doc.text("Calculation Details", 20, y + 7);
+
+    // === Inputs ===
+    let innerY = y + 18;
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text("Inputs:", 20, innerY);
+    innerY += 8;
+    doc.text(`Commute: ${calculationData.commute || "..."} Kilometres (daily)`, 25, innerY);
+    innerY += 7;
+    doc.text(`Waste: ${calculationData.waste || "..."} Kg (daily)`, 25, innerY);
+    innerY += 7;
+    doc.text(`Electricity: ${calculationData.electricity || "..."} kWh (monthly)`, 25, innerY);
+    innerY += 7;
+    doc.text(`Meals: ${calculationData.meals || "..."} (daily)`, 25, innerY);
+
+    // === Results ===
+    innerY += 12;
+    doc.setFont("helvetica", "bold");
+    doc.text("Summary (results):", 20, innerY);
+    innerY += 8;
+    doc.setFont("helvetica", "normal");
+    doc.text(`Commute: ${calculationData.commuteCO2 || "..."} CO₂e/month`, 25, innerY);
+    innerY += 7;
+    doc.text(`Waste: ${calculationData.wasteCO2 || "..."} CO₂e/month`, 25, innerY);
+    innerY += 7;
+    doc.text(`Electricity: ${calculationData.electricityCO2 || "..."} CO₂e/month`, 25, innerY);
+    innerY += 7;
+    doc.text(`Meals: ${calculationData.mealsCO2 || "..."} CO₂e/month`, 25, innerY);
+
+    // === Yearly total ===
+    innerY += 20;
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(200, 0, 0); // red
+    doc.setFontSize(13);
+    doc.text(
+        `Total Emissions yearly: ${calculationData.total ? calculationData.total.toFixed(2) : "..."} kg CO₂e/Year`,
+        20,
+        innerY
+    );
+
+    // === Footer ===
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "normal");
+    doc.text(
+        "A climate awareness and action initiative by: Carbon Calculator Yanga Foundation, © 2025",
+        105,
+        290,
+        { align: "center" }
+    );
+
     // Save the PDF
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
