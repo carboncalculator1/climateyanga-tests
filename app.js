@@ -79,7 +79,7 @@ async function saveCalculation(inputs, results, type) {
         };
 
         results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
-        calculationData = { ...inputs, ...results };
+        calculationData = { inputs, results };
 	// After calculation
     	const saved = await saveCalculation(inputs, results, 'personal');
     	
@@ -107,9 +107,8 @@ async function saveCalculation(inputs, results, type) {
         };
 
         results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
-        calculationData = { ...inputs, ...results };
-results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
-        calculationData = { ...inputs, ...results };
+        calculationData = { inputs, results };
+
 	
 	// After calculation
     	const saved = await saveCalculation(inputs, results, 'construction');
@@ -139,7 +138,7 @@ results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
         };
 
         results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
-        calculationData = { ...inputs, ...results };
+        calculationData = { inputs, results };
 
     		// After calculation
     		const saved = await saveCalculation(inputs, results, 'manufacturing');
@@ -295,7 +294,7 @@ async function exportToPDF() {
     // === CALCULATION DETAILS BOX ===
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
-    doc.rect(10, 80, 190, 100); // outer box
+    doc.rect(10, 80, 190, 150); // outer box
     doc.line(10, 50, 200, 50); // line after header
     doc.text('Calculation Details', 12, 47);
 
@@ -303,7 +302,7 @@ async function exportToPDF() {
     doc.setFont(undefined, 'normal');
     doc.text('Inputs:', 12, 57);
     let y = 65;
-    for (const [key, value] of Object.entries(inputs)) {
+    for (const [key, value] of Object.entries(calculationData.inputs)) {
         if (['total'].includes(key)) continue; // skip totals here
         if (typeof value === 'number') {
             doc.text(`${key}: ${value.toFixed(2)}`, 20, y);
@@ -318,7 +317,7 @@ async function exportToPDF() {
     y += 8;
     doc.setFont(undefined, 'normal');
 
-    for (const [key, value] of Object.entries(results)) {
+    for (const [key, value] of Object.entries(calculationData.results)) {
         if (key === 'total') continue;
         if (typeof value === 'number') {
             doc.text(`${key}: ${value.toFixed(2)} kg CO₂e/month`, 20, y);
@@ -331,7 +330,7 @@ async function exportToPDF() {
     doc.setTextColor(255, 0, 0); // red text
     doc.setFontSize(12);
     doc.text(
-        `Total Emissions yearly: ${ (calculationData.total * 12).toFixed(2) } kg CO₂e/Year`,
+        `Total Emissions yearly: ${(calculationData.results.total * 12).toFixed(2)} kg CO₂e/Year`,
         12,
         y
     );
@@ -349,4 +348,5 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
