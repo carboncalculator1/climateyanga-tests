@@ -295,7 +295,7 @@ async function exportToPDF() {
     // === CALCULATION DETAILS BOX ===
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
-    doc.rect(10, 40, 190, 100); // outer box
+    doc.rect(10, 80, 190, 100); // outer box
     doc.line(10, 50, 200, 50); // line after header
     doc.text('Calculation Details', 12, 47);
 
@@ -303,7 +303,7 @@ async function exportToPDF() {
     doc.setFont(undefined, 'normal');
     doc.text('Inputs:', 12, 57);
     let y = 65;
-    for (const [key, value] of Object.entries(calculationData)) {
+    for (const [key, value] of Object.entries(inputs)) {
         if (['total'].includes(key)) continue; // skip totals here
         if (typeof value === 'number') {
             doc.text(`${key}: ${value.toFixed(2)}`, 20, y);
@@ -318,7 +318,7 @@ async function exportToPDF() {
     y += 8;
     doc.setFont(undefined, 'normal');
 
-    for (const [key, value] of Object.entries(calculationData)) {
+    for (const [key, value] of Object.entries(results)) {
         if (key === 'total') continue;
         if (typeof value === 'number') {
             doc.text(`${key}: ${value.toFixed(2)} kg CO₂e/month`, 20, y);
@@ -349,3 +349,4 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
