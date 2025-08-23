@@ -283,6 +283,7 @@ async function exportToPDF() {
     doc.rect(0, 0, 210, 15, 'F'); // full-width top bar
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
+	doc.setFont(undefined, 'bold');
     doc.text('Carbon Emissions Summary', 105, 10, { align: 'center' });
 
     // === USER INFO ===
@@ -294,12 +295,12 @@ async function exportToPDF() {
     // === CALCULATION DETAILS BOX ===
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
-    doc.rect(10, 40, 190, 120); // outer box
+    doc.rect(10, 40, 190, 100); // outer box
     doc.line(10, 50, 200, 50); // line after header
     doc.text('Calculation Details', 12, 47);
 
     // Inputs
-    doc.setFont(undefined, 'normal');
+    doc.setFont(undefined, 'bold');
     doc.text('Inputs:', 12, 57);
     let y = 65;
     for (const [key, value] of Object.entries(calculationData.inputs)) {
@@ -329,6 +330,7 @@ async function exportToPDF() {
     y += 10;
     doc.setTextColor(255, 0, 0); // red text
     doc.setFontSize(12);
+	doc.setFont(undefined, 'bold');
     doc.text(
         `Total Emissions yearly: ${(calculationData.results.total * 12).toFixed(2)} kg CO₂e/Year`,
         12,
@@ -348,6 +350,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
