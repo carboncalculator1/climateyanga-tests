@@ -149,7 +149,7 @@ function viewCalculationDetails(userId, calcId) {
             const calculation = calcDoc.data();
 
             const detailsHtml = `
-                <p><strong>User:</strong> ${userId}</p>
+                <p><strong>User:</strong> ${userData.username}</p>
                 <p><strong>Type:</strong> ${calculation.type}</p>
                 <p><strong>Date:</strong> ${calculation.timestamp ? calculation.timestamp.toDate().toLocaleString() : 'Unknown'}</p>
 
