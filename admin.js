@@ -92,88 +92,92 @@ async function loadAdminData() {
 }
 
 
+// --- VIEW USER DETAILS ---
 async function viewUserDetails(userId) {
-    const userDoc = await db.collection('users').doc(userId).get();
-    const userData = userDoc.data();
-
-    // Fetch calculations subcollection
-    const calcSnapshot = await db.collection('users')
-        .doc(userId)
-        .collection('calculations')
-        .orderBy('timestamp', 'desc')
-        .get();
-
-    let detailsHtml = `
-        <h3>${userData.username || userData.email}</h3>
-        <p><strong>Email:</strong> ${userData.email}</p>
-        <p><strong>Signup Date:</strong> ${userData.createdAt ? userData.createdAt.toDate().toLocaleDateString() : 'N/A'}</p>
-        <h4>Calculations (${calcSnapshot.size}):</h4>
-    `;
-
-    if (!calcSnapshot.empty) {
-        detailsHtml += '<ul>';
-        calcSnapshot.forEach((calcDoc, index) => {
-            const calc = calcDoc.data();
-            detailsHtml += `
-                <li>
-                    <strong>${calc.type}</strong> - 
-                    ${calc.timestamp ? calc.timestamp.toDate().toLocaleDateString() : 'Unknown date'} - 
-                    Total: ${calc.results?.total?.toFixed(1) || 0} kg CO₂e
-                    <button class="view-calc-btn" data-uid="${userId}" data-id="${calcDoc.id}">View Details</button>
-                </li>
-            `;
-        });
-        detailsHtml += '</ul>';
-    } else {
-        detailsHtml += '<p>No calculations yet.</p>';
-    }
-
-    document.getElementById('userDetailsContent').innerHTML = detailsHtml;
-
-    // Add event listeners for calculation detail buttons
-    document.querySelectorAll('.view-calc-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const userId = btn.getAttribute('data-uid');
-            const calcId = btn.getAttribute('data-id');
-            viewCalculationDetails(userId, calcId);
-        });
-    });
-}
-
-
-async function viewCalculationDetails(userId, calcId) {
     try {
-        // Get user data
         const userDoc = await db.collection('users').doc(userId).get();
+        if (!userDoc.exists) {
+            alert('User not found.');
+            return;
+        }
         const userData = userDoc.data();
 
-        // Get the specific calculation from the subcollection
-        const calcDoc = await db.collection('users')
-                                .doc(userId)
-                                .collection('calculations')
-                                .doc(calcId)
-                                .get();
-        if (!calcDoc.exists) {
-            document.getElementById('calculationDetailsContent').innerHTML = '<p>Calculation not found.</p>';
+        // Fetch calculations subcollection
+        const calcSnapshot = await db.collection('users')
+            .doc(userId)
+            .collection('calculations')
+            .orderBy('timestamp', 'desc')
+            .get();
+
+        let detailsHtml = `
+            <h3>${userData.username || userData.email}</h3>
+            <p><strong>Email:</strong> ${userData.email}</p>
+            <p><strong>Signup Date:</strong> ${userData.createdAt ? userData.createdAt.toDate().toLocaleDateString() : 'N/A'}</p>
+            <h4>Calculations (${calcSnapshot.size}):</h4>
+        `;
+
+        if (!calcSnapshot.empty) {
+            detailsHtml += '<ul>';
+            calcSnapshot.forEach(calcDoc => {
+                const calc = calcDoc.data();
+                detailsHtml += `
+                    <li>
+                        <strong>${calc.type || 'Unknown type'}</strong> - 
+                        ${calc.timestamp ? calc.timestamp.toDate().toLocaleDateString() : 'Unknown date'} - 
+                        Total: ${calc.results?.total?.toFixed(1) || 0} kg CO₂e
+                        <button class="view-calc-btn" data-uid="${userId}" data-id="${calcDoc.id}">View Details</button>
+                    </li>
+                `;
+            });
+            detailsHtml += '</ul>';
+        } else {
+            detailsHtml += '<p>No calculations yet.</p>';
+        }
+
+        document.getElementById('userDetailsContent').innerHTML = detailsHtml;
+
+        // Add event listeners for calculation detail buttons
+        document.querySelectorAll('.view-calc-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const userId = btn.getAttribute('data-uid');
+                const calcId = btn.getAttribute('data-id');
+                viewCalculationDetails(userId, calcId);
+            });
+        });
+    } catch (error) {
+        console.error('Error fetching user details:', error);
+    }
+}
+
+// --- VIEW CALCULATION DETAILS ---
+async function viewCalculationDetails(userId, calcId) {
+    try {
+        const [userDoc, calcDoc] = await Promise.all([
+            db.collection('users').doc(userId).get(),
+            db.collection('users').doc(userId).collection('calculations').doc(calcId).get()
+        ]);
+
+        if (!userDoc.exists || !calcDoc.exists) {
+            alert('Calculation or user not found.');
             return;
         }
 
+        const userData = userDoc.data();
         const calculation = calcDoc.data();
 
         const detailsHtml = `
             <p><strong>User:</strong> ${userData.username || userData.email}</p>
-            <p><strong>Type:</strong> ${calculation.type}</p>
+            <p><strong>Type:</strong> ${calculation.type || 'Unknown type'}</p>
             <p><strong>Date:</strong> ${calculation.timestamp ? calculation.timestamp.toDate().toLocaleString() : 'Unknown'}</p>
             
             <h4>Inputs:</h4>
-            <pre>${JSON.stringify(calculation.inputs, null, 2)}</pre>
+            <pre>${JSON.stringify(calculation.inputs || {}, null, 2)}</pre>
             
             <h4>Results:</h4>
-            <pre>${JSON.stringify(calculation.results, null, 2)}</pre>
+            <pre>${JSON.stringify(calculation.results || {}, null, 2)}</pre>
         `;
 
         document.getElementById('calculationDetailsContent').innerHTML = detailsHtml;
-
     } catch (error) {
         console.error('Error fetching calculation details:', error);
     }
