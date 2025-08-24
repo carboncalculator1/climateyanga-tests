@@ -141,26 +141,23 @@ async function viewUserDetails(userId) {
 }
 
 
-function viewCalculationDetails(userId, calcId) {
-    db.collection('users').doc(userId)
-        .collection('calculations').doc(calcId)
-        .get()
-        .then(calcDoc => {
-            const calculation = calcDoc.data();
+function viewCalculationDetails(userId, calcIndex) {
+    db.collection('users').doc(userId).get().then(userDoc => {
+        const userData = userDoc.data();
+        const calculation = userData.calculations[calcIndex];
 
-            const detailsHtml = `
-                <p><strong>User:</strong> ${userData.username || userData.email}</p>
-                <p><strong>Type:</strong> ${calculation.type}</p>
-                <p><strong>Date:</strong> ${calculation.timestamp ? calculation.timestamp.toDate().toLocaleString() : 'Unknown'}</p>
+        const detailsHtml = `
+            <p><strong>User:</strong> ${userData.username || userData.email}</p>
+            <p><strong>Type:</strong> ${calculation.type}</p>
+            <p><strong>Date:</strong> ${calculation.timestamp ? calculation.timestamp.toDate().toLocaleString() : 'Unknown'}</p>
+            
+            <h4>Inputs:</h4>
+            <pre>${JSON.stringify(calculation.inputs, null, 2)}</pre>
+            
+            <h4>Results:</h4>
+            <pre>${JSON.stringify(calculation.results, null, 2)}</pre>
+        `;
 
-                <h4>Inputs:</h4>
-                <pre>${JSON.stringify(calculation.inputs, null, 2)}</pre>
-
-                <h4>Results:</h4>
-                <pre>${JSON.stringify(calculation.results, null, 2)}</pre>
-            `;
-
-            document.getElementById('calculationDetailsContent').innerHTML = detailsHtml;
-        });
+        document.getElementById('calculationDetailsContent').innerHTML = detailsHtml;
+    });
 }
-
