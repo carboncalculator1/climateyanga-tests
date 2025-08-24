@@ -34,28 +34,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadAdminData() {
     try {
-        // Get all users
         const usersSnapshot = await db.collection('users').get();
         const usersTableBody = document.getElementById('usersTableBody');
         usersTableBody.innerHTML = '';
-        
+
         let totalCalculations = 0;
         let totalEmissions = 0;
-        
-        usersSnapshot.forEach(doc => {
+
+        for (const doc of usersSnapshot.docs) {
             const userData = doc.data();
-            const calculationsCount = userData.calculations ? userData.calculations.length : 0;
+
+            // Fetch the calculations subcollection
+            const calcSnapshot = await db.collection('users')
+                .doc(doc.id)
+                .collection('calculations')
+                .get();
+
+            const calculationsCount = calcSnapshot.size;
             totalCalculations += calculationsCount;
-            
-            // Calculate total emissions for this user
+
             let userEmissions = 0;
-            if (userData.calculations) {
-                userData.calculations.forEach(calc => {
-                    userEmissions += calc.results.total || 0;
-                });
-                totalEmissions += userEmissions;
-            }
-            
+            calcSnapshot.forEach(calcDoc => {
+                const calc = calcDoc.data();
+                userEmissions += calc.results?.total || 0;
+            });
+            totalEmissions += userEmissions;
+
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${userData.username || 'N/A'}</td>
@@ -67,48 +71,55 @@ async function loadAdminData() {
                 </td>
             `;
             usersTableBody.appendChild(row);
-        });
-        
-        // Update stats
+        }
+
         document.getElementById('totalUsers').textContent = usersSnapshot.size;
         document.getElementById('totalCalculations').textContent = totalCalculations;
-        document.getElementById('avgEmissions').textContent = usersSnapshot.size > 0 
-            ? (totalEmissions / usersSnapshot.size).toFixed(1) + ' kg' 
+        document.getElementById('avgEmissions').textContent = usersSnapshot.size > 0
+            ? (totalEmissions / usersSnapshot.size).toFixed(1) + ' kg'
             : '0 kg';
-        
-        // Add event listeners to view user buttons
+
         document.querySelectorAll('.view-user-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const userId = btn.getAttribute('data-uid');
                 viewUserDetails(userId);
             });
         });
-        
+
     } catch (error) {
         console.error('Error loading admin data:', error);
     }
 }
 
+
 async function viewUserDetails(userId) {
     const userDoc = await db.collection('users').doc(userId).get();
     const userData = userDoc.data();
+
+    // Fetch calculations subcollection
+    const calcSnapshot = await db.collection('users')
+        .doc(userId)
+        .collection('calculations')
+        .orderBy('timestamp', 'desc')
+        .get();
 
     let detailsHtml = `
         <h3>${userData.username || userData.email}</h3>
         <p><strong>Email:</strong> ${userData.email}</p>
         <p><strong>Signup Date:</strong> ${userData.createdAt ? userData.createdAt.toDate().toLocaleDateString() : 'N/A'}</p>
-        <h4>Calculations (${userData.calculations ? userData.calculations.length : 0}):</h4>
+        <h4>Calculations (${calcSnapshot.size}):</h4>
     `;
 
-    if (userData.calculations && userData.calculations.length > 0) {
+    if (!calcSnapshot.empty) {
         detailsHtml += '<ul>';
-        userData.calculations.forEach((calc, index) => {
+        calcSnapshot.forEach((calcDoc, index) => {
+            const calc = calcDoc.data();
             detailsHtml += `
                 <li>
                     <strong>${calc.type}</strong> - 
                     ${calc.timestamp ? calc.timestamp.toDate().toLocaleDateString() : 'Unknown date'} - 
-                    Total: ${calc.results.total.toFixed(1)} kg CO₂e
-                    <button class="view-calc-btn" data-uid="${userId}" data-index="${index}">View Details</button>
+                    Total: ${calc.results?.total?.toFixed(1) || 0} kg CO₂e
+                    <button class="view-calc-btn" data-uid="${userId}" data-id="${calcDoc.id}">View Details</button>
                 </li>
             `;
         });
@@ -123,29 +134,33 @@ async function viewUserDetails(userId) {
     document.querySelectorAll('.view-calc-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const userId = btn.getAttribute('data-uid');
-            const index = btn.getAttribute('data-index');
-            viewCalculationDetails(userId, index);
+            const calcId = btn.getAttribute('data-id');
+            viewCalculationDetails(userId, calcId);
         });
     });
 }
 
-function viewCalculationDetails(userId, calcIndex) {
-    db.collection('users').doc(userId).get().then(userDoc => {
-        const userData = userDoc.data();
-        const calculation = userData.calculations[calcIndex];
 
-        const detailsHtml = `
-            <p><strong>User:</strong> ${userData.username || userData.email}</p>
-            <p><strong>Type:</strong> ${calculation.type}</p>
-            <p><strong>Date:</strong> ${calculation.timestamp ? calculation.timestamp.toDate().toLocaleString() : 'Unknown'}</p>
-            
-            <h4>Inputs:</h4>
-            <pre>${JSON.stringify(calculation.inputs, null, 2)}</pre>
-            
-            <h4>Results:</h4>
-            <pre>${JSON.stringify(calculation.results, null, 2)}</pre>
-        `;
+function viewCalculationDetails(userId, calcId) {
+    db.collection('users').doc(userId)
+        .collection('calculations').doc(calcId)
+        .get()
+        .then(calcDoc => {
+            const calculation = calcDoc.data();
 
-        document.getElementById('calculationDetailsContent').innerHTML = detailsHtml;
-    });
+            const detailsHtml = `
+                <p><strong>User:</strong> ${userId}</p>
+                <p><strong>Type:</strong> ${calculation.type}</p>
+                <p><strong>Date:</strong> ${calculation.timestamp ? calculation.timestamp.toDate().toLocaleString() : 'Unknown'}</p>
+
+                <h4>Inputs:</h4>
+                <pre>${JSON.stringify(calculation.inputs, null, 2)}</pre>
+
+                <h4>Results:</h4>
+                <pre>${JSON.stringify(calculation.results, null, 2)}</pre>
+            `;
+
+            document.getElementById('calculationDetailsContent').innerHTML = detailsHtml;
+        });
 }
+
