@@ -141,10 +141,24 @@ async function viewUserDetails(userId) {
 }
 
 
-function viewCalculationDetails(userId, calcIndex) {
-    db.collection('users').doc(userId).get().then(userDoc => {
+async function viewCalculationDetails(userId, calcId) {
+    try {
+        // Get user data
+        const userDoc = await db.collection('users').doc(userId).get();
         const userData = userDoc.data();
-        const calculation = userData.calculations[calcIndex];
+
+        // Get the specific calculation from the subcollection
+        const calcDoc = await db.collection('users')
+                                .doc(userId)
+                                .collection('calculations')
+                                .doc(calcId)
+                                .get();
+        if (!calcDoc.exists) {
+            document.getElementById('calculationDetailsContent').innerHTML = '<p>Calculation not found.</p>';
+            return;
+        }
+
+        const calculation = calcDoc.data();
 
         const detailsHtml = `
             <p><strong>User:</strong> ${userData.username || userData.email}</p>
@@ -159,5 +173,8 @@ function viewCalculationDetails(userId, calcIndex) {
         `;
 
         document.getElementById('calculationDetailsContent').innerHTML = detailsHtml;
-    });
+
+    } catch (error) {
+        console.error('Error fetching calculation details:', error);
+    }
 }
