@@ -305,22 +305,20 @@
         </div>
     </div>
 <div class="input-group">
-
+    <label>
         <i class="fas fa-wind icon"></i>
         Methane Capture Technology
-
-   <div class="input-group">
+        <span class="tooltip">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltiptext">Check if methane capture technology is implemented (reduces livestock emissions)</span>
+        </span>
+    </label>
     <div class="checkbox-container">
-        <label class="checkbox-label">
+        <label for="methaneCaptureCheckbox" class="checkbox-label">
             <input type="checkbox" id="methaneCaptureCheckbox">
             Yes, I am using methane capture
-            <span class="tooltip">
-                <i class="fas fa-info-circle"></i>
-                <span class="tooltiptext">Check if methane capture technology is implemented (reduces livestock emissions)</span>
-            </span>
         </label>
     </div>
-</div>
 </div>
 
     <button class="calculate-btn" onclick="calculateAgriculture()">
@@ -486,8 +484,6 @@
 </footer>
 
 
-
-   
 
 <script src="app.js"></script>
 
