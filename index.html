@@ -50,6 +50,10 @@
                 <i class="fas fa-industry"></i>
                 Manufacturing
             </button>
+			    <button class="nav-btn" onclick="showSection('agriculture')">
+        <i class="fas fa-tractor"></i>
+        		Agriculture
+    </button>
         </div>
 
         <div id="personal" class="section active">
@@ -255,6 +259,68 @@
                 Calculate Manufacturing Emissions
             </button>
         </div>
+
+		<!-- AGRICULTURE SECTION -->
+<div id="agriculture" class="section">
+    <div class="input-group">
+        <label>
+            <i class="fas fa-cubes icon"></i>
+            Land Use (hectares/month)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Amount of land used for agriculture</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="500" value="50" step="1" oninput="updateSliderValue(this, 'agricultureLandValue')">
+            <span class="slider-value" id="agricultureLandValue">50</span>
+        </div>
+    </div>
+    <div class="input-group">
+        <label>
+            <i class="fas fa-bolt icon"></i>
+            Fertilizer Usage (kg/month)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Monthly fertilizer consumption</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="1000" value="100" step="10" oninput="updateSliderValue(this, 'fertilizerValue')">
+            <span class="slider-value" id="fertilizerValue">100</span>
+        </div>
+    </div>
+    <div class="input-group">
+        <label>
+            <i class="fas fa-tractor icon"></i>
+            Livestock Count (animals)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Number of livestock raised</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="1000" value="20" step="1" oninput="updateSliderValue(this, 'livestockValue')">
+            <span class="slider-value" id="livestockValue">20</span>
+        </div>
+    </div>
+    <div class="input-group">
+        <label>
+            <i class="fas fa-truck icon"></i>
+            Methane Capture Technology
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Check if methane capture technology is implemented (reduces livestock emissions)</span>
+            </span>
+        </label>
+        <input type="checkbox" id="methaneCaptureCheckbox">
+        <span>Enabled</span>
+    </div>
+    <button class="calculate-btn" onclick="calculateAgriculture()">
+        <i class="fas fa-calculator"></i>
+        Calculate Agriculture Emissions
+    </button>
+</div>
 
         <div id="results" class="section">
             <div class="results-header">
