@@ -1185,6 +1185,22 @@
     color: #6c757d;
 }
 
+.checkbox-container {
+  margin-top: 5px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* space between checkbox and text */
+  cursor: pointer;
+  font-size: 14px;
+}
+.checkbox-label input[type="checkbox"] {
+  transform: scale(1.2); /* make checkbox a bit bigger */
+}
+
+
 
 
 
