@@ -304,20 +304,23 @@
             <span class="slider-value" id="livestockValue">20</span>
         </div>
     </div>
-    <div class="input-group">
-        <label>
-            <i class="fas fa-wind icon"></i>
-            Methane Capture Technology
-            <span class="tooltip">
-                <i class="fas fa-info-circle"></i>
-                <span class="tooltiptext">Check if methane capture technology is implemented (reduces livestock emissions)</span>
-            </span>
+<div class="input-group">
+    <label>
+        <i class="fas fa-wind icon"></i>
+        Methane Capture Technology
+        <span class="tooltip">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltiptext">Check if methane capture technology is implemented (reduces livestock emissions)</span>
+        </span>
+    </label>
+    <div class="checkbox-container">
+        <label for="methaneCaptureCheckbox" class="checkbox-label">
+            <input type="checkbox" id="methaneCaptureCheckbox">
+            Yes, I am using methane capture
         </label>
-        <div class="checkbox-container">
-          <label for="methaneCaptureCheckbox" class="checkbox-label">
-            <input type="checkbox" id="methaneCaptureCheckbox">Using methane capture</label>
-        </div>
     </div>
+</div>
+
     <button class="calculate-btn" onclick="calculateAgriculture()">
         <i class="fas fa-calculator"></i>
         Calculate Agriculture Emissions
