@@ -148,37 +148,36 @@ async function saveCalculation(inputs, results, type) {
     }
 
 async function calculateAgriculture() {
-        const inputs = {
-         land: parseFloat(document.getElementById('agricultureLandValue').textContent),
-         fertilizer: parseFloat(document.getElementById('fertilizerValue').textContent),
-         livestock: parseFloat(document.getElementById('livestockValue').textContent),
-         methaneCapture: document.getElementById('methaneCaptureCheckbox').checked
-        };
+    const inputs = {
+        land: parseFloat(document.getElementById('agricultureLandValue').textContent),
+        fertilizer: parseFloat(document.getElementById('fertilizerValue').textContent),
+        livestock: parseFloat(document.getElementById('livestockValue').textContent),
+        methaneCapture: document.getElementById('methaneCaptureCheckbox').checked
+    };
 
-		let livestockEmissions = livestock * 50;
-        if (methaneCapture) {
-            livestockEmissions *= 0.7; // 30% reduction with methane capture
-        }
+    if (!validateInputs(inputs)) return;
 
-
-        if (!validateInputs(inputs)) return;
-
-        // All inputs are already monthly
-        const results = {
-            Land: land * 0.3,
-            Fertilizer: fertilizer * 1.2,
-            Livestock: livestockEmissions
-        };
-
-        results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
-        calculationData = { inputs, results };
-
-    		// After calculation
-    		const saved = await saveCalculation(inputs, results, 'agriculture');
-    		
-
-        displayResults(results);
+    // Calculate livestock emissions with optional methane capture reduction
+    let livestockEmissions = inputs.livestock * 50;
+    if (inputs.methaneCapture) {
+        livestockEmissions *= 0.7; // 30% reduction
     }
+
+    // All inputs are monthly
+    const results = {
+        Land: inputs.land * 0.3,
+        Fertilizer: inputs.fertilizer * 1.2,
+        Livestock: livestockEmissions
+    };
+
+    results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
+    calculationData = { inputs, results };
+
+    // Save to Firestore
+    const saved = await saveCalculation(inputs, results, 'agriculture');
+
+    displayResults(results);
+}
 
 
     function displayResults(data) {
@@ -268,58 +267,26 @@ async function calculateAgriculture() {
                     <div class="category-percentage">${((data.Transport / data.total) * 100).toFixed(1)}% of total</div>
                 </div>
             `;
-        }
+        } else if (currentSection === 'agriculture') {
+        summaryContainer.innerHTML = `
+            <div class="emissions-category">
+                <div class="category-name">Land Use</div>
+                <div class="category-value">${data.Land.toFixed(1)} kg CO₂e/month</div>
+                <div class="category-percentage">${((data.Land / data.total) * 100).toFixed(1)}% of total</div>
+            </div>
+            <div class="emissions-category">
+                <div class="category-name">Fertilizer</div>
+                <div class="category-value">${data.Fertilizer.toFixed(1)} kg CO₂e/month</div>
+                <div class="category-percentage">${((data.Fertilizer / data.total) * 100).toFixed(1)}% of total</div>
+            </div>
+            <div class="emissions-category">
+                <div class="category-name">Livestock</div>
+                <div class="category-value">${data.Livestock.toFixed(1)} kg CO₂e/month</div>
+                <div class="category-percentage">${((data.Livestock / data.total) * 100).toFixed(1)}% of total</div>
+            </div>
+        `;
+    }
 
-        // Update total emissions (show in tonnes for annual total)
-        const annualTonnes = (data.total * 12 / 1000).toFixed(1);
-        document.getElementById('totalEmissions').textContent = `Total Annual Emissions: ${annualTonnes} Tonnes CO₂e/Year`;
-        document.getElementById('dailyAverage').textContent = `Daily Average: ${dailyAverage} kg CO₂e/day`;
-
-        document.getElementById('results').classList.add('active');
-        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-    } else if (section === 'agriculture') {
-            html = `
-                <div class="emissions-category">
-                    <div class="emissions-category-content">
-                        <div class="category-name">
-                            <i class="fas fa-tractor"></i>
-                            Land Use
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${safePercentage(data.Land).toFixed(1)}%; background: var(--agriculture-color);"></div>
-                        </div>
-                        <div class="category-percentage">${safePercentage(data.Land).toFixed(1)}% of total</div>
-                    </div>
-                    <div class="category-value">${data.Land.toFixed(1)} kg</div>
-                </div>
-                <div class="emissions-category">
-                    <div class="emissions-category-content">
-                        <div class="category-name">
-                            <i class="fas fa-flask"></i>
-                            Fertilizer
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${safePercentage(data.Fertilizer).toFixed(1)}%; background: var(--agriculture-color);"></div>
-                        </div>
-                        <div class="category-percentage">${safePercentage(data.Fertilizer).toFixed(1)}% of total</div>
-                    </div>
-                    <div class="category-value">${data.Fertilizer.toFixed(1)} kg</div>
-                </div>
-                <div class="emissions-category">
-                    <div class="emissions-category-content">
-                        <div class="category-name">
-                            <i class="fas fa-cow"></i>
-                            Livestock
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${safePercentage(data.Livestock).toFixed(1)}%; background: var(--agriculture-color);"></div>
-                        </div>
-                        <div class="category-percentage">${safePercentage(data.Livestock).toFixed(1)}% of total</div>
-                    </div>
-                    <div class="category-value">${data.Livestock.toFixed(1)} kg</div>
-                </div>
-            `;
-        } 
 
         // Update total emissions (show in tonnes for annual total)
         const annualTonnes = (data.total * 12 / 1000).toFixed(1);
@@ -435,6 +402,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
