@@ -1191,7 +1191,7 @@
 
 .checkbox-label {
   display: flex;          /* aligns checkbox and text in a row */
-  align-items: center;    /* vertically center text with checkbox */
+  align-items: left;    /* vertically center text with checkbox */
   gap: 8px;               /* space between checkbox and text */
   cursor: pointer;
   font-size: 14px;
@@ -1201,6 +1201,7 @@
   transform: scale(1.2);
   margin: 0; /* remove default spacing */
 }
+
 
 
 
