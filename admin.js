@@ -18,11 +18,18 @@ document.addEventListener('DOMContentLoaded', function() {
         // Load admin data
         loadAdminData();
         
+        
         // Set up logout button
         document.getElementById('logoutBtn').addEventListener('click', () => {
             auth.signOut().then(() => {
                 window.location.href = 'login.html';
             });
+        });
+
+        // Set up location filter
+        document.getElementById('locationFilter').addEventListener('change', (e) => {
+        currentLocationFilter = e.target.value;
+        loadAdminData();
         });
         
         // Set up refresh button
@@ -32,11 +39,20 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+let currentLocationFilter = 'all';
 async function loadAdminData() {
     try {
+        let usersQuery = db.collection('users');
+        
+        // Apply location filter if not 'all'
+        if (currentLocationFilter !== 'all') {
+            usersQuery = usersQuery.where('province', '==', currentLocationFilter);
+        }
+        
         const usersSnapshot = await db.collection('users').get();
         const usersTableBody = document.getElementById('usersTableBody');
         usersTableBody.innerHTML = '';
+        
 
         let totalCalculations = 0;
         let totalEmissions = 0;
@@ -64,6 +80,7 @@ async function loadAdminData() {
             row.innerHTML = `
                 <td>${userData.username || 'N/A'}</td>
                 <td>${userData.email}</td>
+                <td>${userData.province || 'Not specified'}</td>
                 <td>${userData.createdAt ? userData.createdAt.toDate().toLocaleDateString() : 'N/A'}</td>
                 <td>${calculationsCount}</td>
                 <td>
@@ -112,6 +129,7 @@ async function viewUserDetails(userId) {
         let detailsHtml = `
             <h3>${userData.username || userData.email}</h3>
             <p><strong>Email:</strong> ${userData.email}</p>
+            <p><strong>Province:</strong> ${userData.province || 'Not specified'}</p>
             <p><strong>Signup Date:</strong> ${userData.createdAt ? userData.createdAt.toDate().toLocaleDateString() : 'N/A'}</p>
             <h4>Calculations (${calcSnapshot.size}):</h4>
         `;
