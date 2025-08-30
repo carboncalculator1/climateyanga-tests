@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const password = document.getElementById('signupPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         const errorElement = document.getElementById('signupError');
+        const province = document.getElementById('signupProvince').value;
         
         errorElement.textContent = '';
         
@@ -77,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
             await db.collection('users').doc(user.uid).set({
                 username: username,
                 email: email,
+                province: province,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 calculations: []
             });
