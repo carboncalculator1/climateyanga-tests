@@ -1033,11 +1033,20 @@
     border-radius: 6px;
     background-color: white;
     cursor: pointer;
+	color: #343a40; /* Add this line to ensure text is black/dark */
+    font-family: 'Poppins', sans-serif; /* Ensure consistent font */
 }
 
 .admin-menu select:focus {
     outline: none;
     border-color: #28a745;
+}
+
+/* Ensure the dropdown options have proper styling */
+.admin-menu select option {
+    color: #343a40;
+    background-color: white;
+    padding: 8px;
 }
 
 .admin-btn {
@@ -1246,5 +1255,6 @@
   transform: scale(1.2);
   margin: 0; /* remove default spacing */
 }
+
 
 
