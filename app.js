@@ -341,6 +341,7 @@ async function exportToPDF() {
     // === USER INFO ===
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(10);
+	doc.text(`User: ${username}`, 10, 25);
 	const userProvince = userData.province || 'Not specified';
 	doc.text(`Province: ${userProvince}`, 10, 31);
 	doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 37);
@@ -403,6 +404,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
