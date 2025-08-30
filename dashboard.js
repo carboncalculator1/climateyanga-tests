@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Display user info
         const userDoc = await db.collection('users').doc(user.uid).get();
         const userData = userDoc.data();
-        document.getElementById('userWelcome').textContent = `Welcome, ${userData.username || user.email}!`;
+        document.getElementById('userWelcome').textContent = `Welcome, ${userData.username || user.email}! (${userData.province || 'No province'})`;
 
         // Add admin link if user is admin
        if (userData.isAdmin) {
