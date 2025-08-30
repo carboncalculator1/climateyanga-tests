@@ -1027,6 +1027,19 @@
     gap: 10px;
 }
 
+.admin-menu select {
+    padding: 8px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.admin-menu select:focus {
+    outline: none;
+    border-color: #28a745;
+}
+
 .admin-btn {
     background-color: #28a745;
     color: white;
@@ -1233,14 +1246,5 @@
   transform: scale(1.2);
   margin: 0; /* remove default spacing */
 }
-
-
-
-
-
-
-
-
-
 
 
