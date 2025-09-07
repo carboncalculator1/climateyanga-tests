@@ -326,6 +326,66 @@
     </button>
 </div>
 
+<!-- Open Air Section -->
+<button class="nav-btn" onclick="showSection('openair')">
+    <i class="fas fa-fire"></i>
+    Open-Air Burning
+</button>
+
+<!-- Add this after the Agriculture section -->
+<div id="openair" class="section">
+    <div class="input-group">
+        <label>
+            <i class="fas fa-trash icon"></i>
+            Type of Waste Burned
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Select the primary type of waste you burn</span>
+            </span>
+        </label>
+        <select id="wasteType" class="waste-type-select">
+            <option value="plastics">Plastics</option>
+            <option value="paper">Paper/Cardboard</option>
+            <option value="food">Food Waste</option>
+            <option value="garden">Garden Waste</option>
+            <option value="mixed">Mixed Waste</option>
+        </select>
+    </div>
+    <div class="input-group">
+        <label>
+            <i class="fas fa-calendar icon"></i>
+            Burning Frequency
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">How often do you burn waste?</span>
+            </span>
+        </label>
+        <select id="burnFrequency">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+        </select>
+    </div>
+    <div class="input-group">
+        <label>
+            <i class="fas fa-weight-hanging icon"></i>
+            Amount Burned per Session (kg)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Estimated weight of waste burned each time</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="50" value="5" step="0.5" oninput="updateSliderValue(this, 'burnAmountValue')">
+            <span class="slider-value" id="burnAmountValue">5</span>
+        </div>
+    </div>
+    <button class="calculate-btn" onclick="calculateOpenAir()">
+        <i class="fas fa-calculator"></i>
+        Calculate Burning Emissions
+    </button>
+</div>
+
         <div id="results" class="section">
             <div class="results-header">
                 <h2>Emissions Summary</h2>
