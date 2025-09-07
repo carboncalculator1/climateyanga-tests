@@ -1,5 +1,22 @@
     let currentSection = 'personal';
     let calculationData = {};
+    // Add to the emission factors at the top (after line 3)
+    const emissionFactors = {
+        openAir: {
+            plastics: 2.5,    // kg CO₂e per kg
+            paper: 1.2,       // kg CO₂e per kg  
+            food: 0.8,        // kg CO₂e per kg
+            garden: 0.6,      // kg CO₂e per kg
+            mixed: 1.5        // kg CO₂e per kg
+        }
+    };
+
+    // Add frequency multipliers
+    const frequencyMultipliers = {
+        daily: 30,    // Approx monthly (30 days)
+        weekly: 4,    // 4 weeks per month
+        monthly: 1    // Already monthly
+    };
 
     function showSection(section) {
         document.getElementById(currentSection).classList.remove('active');
@@ -179,6 +196,91 @@ async function calculateAgriculture() {
     displayResults(results);
 }
 
+async function calculateOpenAir() {
+    const wasteType = document.getElementById('wasteType').value;
+    const frequency = document.getElementById('burnFrequency').value;
+    const amount = parseFloat(document.getElementById('burnAmountValue').textContent);
+
+    if (isNaN(amount) || amount < 0) {
+        alert('Please enter a valid amount for waste burned');
+        return;
+    }
+
+    const inputs = {
+        wasteType: wasteType,
+        frequency: frequency,
+        amount: amount
+    };
+
+    // Calculate monthly emissions
+    const emissionFactor = emissionFactors.openAir[wasteType];
+    const frequencyMultiplier = frequencyMultipliers[frequency];
+    const monthlyEmissions = amount * emissionFactor * frequencyMultiplier;
+
+    // Black carbon equivalent (approx 5-10% of total emissions as BC)
+    const blackCarbon = monthlyEmissions * 0.07; // 7% as BC estimate
+
+    const results = {
+        TotalEmissions: monthlyEmissions,
+        BlackCarbon: blackCarbon,
+        CO2e: monthlyEmissions - blackCarbon
+    };
+
+    results.total = monthlyEmissions;
+    calculationData = { inputs, results };
+
+    // Save to Firestore
+    const saved = await saveCalculation(inputs, results, 'openair');
+
+    displayOpenAirResults(results);
+}
+
+function displayOpenAirResults(data) {
+    document.getElementById(currentSection).classList.remove('active');
+
+    const totalKg = data.total.toFixed(1);
+    const totalTonnes = (data.total / 1000).toFixed(1);
+    const dailyAverage = (data.total / 30).toFixed(1);
+
+    const summaryContainer = document.querySelector('.emissions-summary');
+    summaryContainer.innerHTML = `
+        <div class="emissions-category">
+            <div class="category-name">Total CO₂e Emissions</div>
+            <div class="category-value">${data.CO2e.toFixed(1)} kg CO₂e/month</div>
+            <div class="category-percentage">${((data.CO2e / data.total) * 100).toFixed(1)}% of total</div>
+        </div>
+        <div class="emissions-category">
+            <div class="category-name">Black Carbon Equivalent</div>
+            <div class="category-value">${data.BlackCarbon.toFixed(1)} kg BCe/month</div>
+            <div class="category-percentage">${((data.BlackCarbon / data.total) * 100).toFixed(1)}% of total</div>
+        </div>
+        <div class="emissions-category">
+            <div class="category-name">Health Impact Indicator</div>
+            <div class="category-value">${(data.BlackCarbon * 10).toFixed(0)} PM2.5 equivalent</div>
+            <div class="category-percentage">Based on IPCC conversion factors</div>
+        </div>
+    `;
+
+    // Update total emissions
+    const annualTonnes = (data.total * 12 / 1000).toFixed(1);
+    document.getElementById('totalEmissions').textContent = `Total Annual Emissions: ${annualTonnes} Tonnes CO₂e/Year`;
+    document.getElementById('dailyAverage').textContent = `Daily Average: ${dailyAverage} kg CO₂e/day`;
+
+    // Add equivalent comparison
+    const drivingEquivalent = (data.total / 2.3).toFixed(0); // approx 2.3kg CO₂e per km driving
+    summaryContainer.innerHTML += `
+        <div class="emissions-category">
+            <div class="category-name">Equivalent to driving</div>
+            <div class="category-value">${drivingEquivalent} km/month</div>
+            <div class="category-percentage">Lusaka to Kabwe: ~${(drivingEquivalent / 140).toFixed(1)} trips</div>
+        </div>
+    `;
+
+    document.getElementById('results').classList.add('active');
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+
 
     function displayResults(data) {
         document.getElementById(currentSection).classList.remove('active');
@@ -285,6 +387,8 @@ async function calculateAgriculture() {
                 <div class="category-percentage">${((data.Livestock / data.total) * 100).toFixed(1)}% of total</div>
             </div>
         `;
+        } else if (currentSection === 'openair') {
+        displayOpenAirResults(data);
     }
 
 
@@ -404,12 +508,6 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
-
-
-
-
-
-
 
 
 
