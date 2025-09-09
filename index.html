@@ -118,6 +118,22 @@
                     <button class="meals-btn" onclick="changeMeals(1)">+</button>
                 </div>
             </div>
+			<!-- Add to index.html in the personal section after the meals control -->
+			<div class="input-group">
+    			<label>
+        			<i class="fas fa-utensils icon"></i>
+        			Meal Type
+        			<span class="tooltip">
+            		<i class="fas fa-info-circle"></i>
+            			<span class="tooltiptext">Select the type of meals you typically eat</span>
+       				 </span>
+    			</label>
+   			 <select id="mealType" class="meal-type-select">
+        			<option value="beef" data-icon="🥩">🥩 Beef stew with nshima & vegetables</option>
+        			<option value="chicken" data-icon="🍗">🍗 Chicken with rice & greens</option>
+        			<option value="vegetarian" data-icon="🌱">🌱 Beans & vegetables with nshima/rice</option>
+    		</select>
+			</div>
             <button class="calculate-btn" onclick="calculatePersonal()">
                 <i class="fas fa-calculator"></i>
                 Calculate Personal Emissions
