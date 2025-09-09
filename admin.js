@@ -1,4 +1,5 @@
 // admin.js
+
 document.addEventListener('DOMContentLoaded', function() {
     // Check if user is admin
     auth.onAuthStateChanged(async (user) => {
@@ -38,6 +39,83 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+const mealTypeLabels = {
+    beef: 'Beef stew with nshima & vegetables',
+    chicken: 'Chicken with rice & greens',
+    vegetarian: 'Beans & vegetables with nshima/rice'
+};
+
+const wasteTypeLabels = {
+    plastics: 'Plastics',
+    paper: 'Paper/Cardboard',
+    food: 'Food Waste',
+    garden: 'Garden Waste',
+    mixed: 'Mixed Waste'
+};
+
+const frequencyLabels = {
+    daily: 'Daily',
+    weekly: 'Weekly',
+    monthly: 'Monthly'
+};
+
+// Function to format calculation inputs for display
+function formatCalculationInputs(inputs, type) {
+    if (!inputs) return 'No inputs available';
+    
+    let formatted = '';
+    
+    for (const [key, value] of Object.entries(inputs)) {
+        let displayValue = value;
+        
+        // Format special string values based on calculation type
+        if (type === 'personal') {
+            if (key === 'mealType') {
+                displayValue = mealTypeLabels[value] || value;
+            }
+        } else if (type === 'openair') {
+            if (key === 'wasteType') {
+                displayValue = wasteTypeLabels[value] || value;
+            } else if (key === 'frequency') {
+                displayValue = frequencyLabels[value] || value;
+            }
+        } else if (type === 'agriculture' && key === 'methaneCapture') {
+            displayValue = value ? 'Yes' : 'No';
+        }
+        
+        // Format numeric values
+        if (typeof value === 'number') {
+            displayValue = value.toFixed(2);
+        }
+        
+        formatted += `${key.replace(/([A-Z])/g, ' $1').toUpperCase()}: ${displayValue}\n`;
+    }
+    
+    return formatted;
+}
+
+// Function to format calculation results for display
+function formatCalculationResults(results) {
+    if (!results) return 'No results available';
+    
+    let formatted = '';
+    
+    for (const [key, value] of Object.entries(results)) {
+        if (key === 'total') continue; // Skip total as it's handled separately
+        
+        if (typeof value === 'number') {
+            formatted += `${key.replace(/([A-Z])/g, ' $1').toUpperCase()}: ${value.toFixed(2)} kg CO₂e/month\n`;
+        }
+    }
+    
+    if (results.total) {
+        formatted += `\nTOTAL: ${results.total.toFixed(2)} kg CO₂e/month`;
+        formatted += `\nANNUAL: ${(results.total * 12).toFixed(2)} kg CO₂e/year`;
+    }
+    
+    return formatted;
+}
 
 let currentLocationFilter = 'all';
 async function loadAdminData() {
@@ -127,27 +205,46 @@ async function viewUserDetails(userId) {
             .get();
 
         let detailsHtml = `
-            <h3>${userData.username || userData.email}</h3>
-            <p><strong>Email:</strong> ${userData.email}</p>
-            <p><strong>Province:</strong> ${userData.province || 'Not specified'}</p>
-            <p><strong>Signup Date:</strong> ${userData.createdAt ? userData.createdAt.toDate().toLocaleDateString() : 'N/A'}</p>
-            <h4>Calculations (${calcSnapshot.size}):</h4>
+            <div class="user-detail-card">
+                <h3>${userData.username || userData.email}</h3>
+                <p><strong>Email:</strong> ${userData.email}</p>
+                <p><strong>Province:</strong> ${userData.province || 'Not specified'}</p>
+                <p><strong>Signup Date:</strong> ${userData.createdAt ? userData.createdAt.toDate().toLocaleDateString() : 'N/A'}</p>
+                <h4>Calculations (${calcSnapshot.size}):</h4>
+            </div>
         `;
 
         if (!calcSnapshot.empty) {
-            detailsHtml += '<ul>';
+            detailsHtml += '<div class="calculations-list">';
             calcSnapshot.forEach(calcDoc => {
                 const calc = calcDoc.data();
+                
+                // Create a brief summary based on calculation type
+                let summary = '';
+                if (calc.type === 'personal' && calc.inputs) {
+                    const mealType = mealTypeLabels[calc.inputs.mealType] || calc.inputs.mealType;
+                    summary = `Meals: ${calc.inputs.meals || 0}/day (${mealType})`;
+                } else if (calc.type === 'openair' && calc.inputs) {
+                    const wasteType = wasteTypeLabels[calc.inputs.wasteType] || calc.inputs.wasteType;
+                    const frequency = frequencyLabels[calc.inputs.frequency] || calc.inputs.frequency;
+                    summary = `${wasteType} - ${frequency} - ${calc.inputs.amount || 0}kg/session`;
+                }
+                
                 detailsHtml += `
-                    <li>
-                        <strong>${calc.type || 'Unknown type'}</strong> - 
-                        ${calc.timestamp ? calc.timestamp.toDate().toLocaleDateString() : 'Unknown date'} - 
-                        Total: ${calc.results?.total?.toFixed(1) || 0} kg CO₂e
+                    <div class="calculation-item">
+                        <div class="calc-header">
+                            <span><strong>${calc.type || 'Unknown type'}</strong></span>
+                            <span>${calc.timestamp ? calc.timestamp.toDate().toLocaleDateString() : 'Unknown date'}</span>
+                        </div>
+                        <div class="calc-summary">
+                            <span>Total: ${calc.results?.total?.toFixed(1) || 0} kg CO₂e</span>
+                            ${summary ? `<span class="calc-details">${summary}</span>` : ''}
+                        </div>
                         <button class="view-calc-btn" data-uid="${userId}" data-id="${calcDoc.id}">View Details</button>
-                    </li>
+                    </div>
                 `;
             });
-            detailsHtml += '</ul>';
+            detailsHtml += '</div>';
         } else {
             detailsHtml += '<p>No calculations yet.</p>';
         }
@@ -183,16 +280,26 @@ async function viewCalculationDetails(userId, calcId) {
         const userData = userDoc.data();
         const calculation = calcDoc.data();
 
+        const inputsFormatted = formatCalculationInputs(calculation.inputs, calculation.type);
+        const resultsFormatted = formatCalculationResults(calculation.results);
+
         const detailsHtml = `
-            <p><strong>User:</strong> ${userData.username || userData.email}</p>
-            <p><strong>Type:</strong> ${calculation.type || 'Unknown type'}</p>
-            <p><strong>Date:</strong> ${calculation.timestamp ? calculation.timestamp.toDate().toLocaleString() : 'Unknown'}</p>
-            
-            <h4>Inputs:</h4>
-            <pre>${JSON.stringify(calculation.inputs || {}, null, 2)}</pre>
-            
-            <h4>Results:</h4>
-            <pre>${JSON.stringify(calculation.results || {}, null, 2)}</pre>
+            <div class="calculation-detail-card">
+                <h3>Calculation Details</h3>
+                <p><strong>User:</strong> ${userData.username || userData.email}</p>
+                <p><strong>Type:</strong> ${calculation.type || 'Unknown type'}</p>
+                <p><strong>Date:</strong> ${calculation.timestamp ? calculation.timestamp.toDate().toLocaleString() : 'Unknown'}</p>
+                
+                <div class="detail-section">
+                    <h4>Inputs:</h4>
+                    <pre class="formatted-data">${inputsFormatted}</pre>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>Results:</h4>
+                    <pre class="formatted-data">${resultsFormatted}</pre>
+                </div>
+            </div>
         `;
 
         document.getElementById('calculationDetailsContent').innerHTML = detailsHtml;
