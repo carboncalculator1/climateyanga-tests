@@ -430,6 +430,7 @@ function displayOpenAirResults(data) {
     }
 
 // PDF export function
+// PDF export function
 async function exportToPDF() {
     const user = auth.currentUser;
     if (!user) {
@@ -451,17 +452,17 @@ async function exportToPDF() {
     doc.rect(0, 0, 210, 15, 'F'); // full-width top bar
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
-	doc.setFont(undefined, 'bold');
+    doc.setFont(undefined, 'bold');
     doc.text('Carbon Emissions Summary', 105, 10, { align: 'center' });
 
     // === USER INFO ===
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(10);
-	doc.text(`User: ${username}`, 10, 25);
-	const userProvince = userData.province || 'Not specified';
-	doc.text(`Province: ${userProvince}`, 10, 31);
-	doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 37);
-	
+    doc.text(`User: ${username}`, 10, 25);
+    const userProvince = userData.province || 'Not specified';
+    doc.text(`Province: ${userProvince}`, 10, 31);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 37);
+    
     // === CALCULATION DETAILS BOX ===
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
@@ -473,12 +474,50 @@ async function exportToPDF() {
     doc.setFont(undefined, 'bold');
     doc.text('Inputs:', 12, 57);
     let y = 65;
+    
+    // Handle different input types based on calculation type
     for (const [key, value] of Object.entries(calculationData.inputs)) {
         if (['total'].includes(key)) continue; // skip totals here
+        
+        let displayText = '';
+        
+        // Format the display based on input type and calculation section
         if (typeof value === 'number') {
-            doc.text(`${key}: ${value.toFixed(2)}`, 20, y);
-            y += 7;
+            displayText = `${key}: ${value.toFixed(2)}`;
+        } else if (typeof value === 'string') {
+            // Handle special cases for personal and open-air burning sections
+            if (key === 'mealType') {
+                const mealTypes = {
+                    'beef': 'Beef stew with nshima & vegetables',
+                    'chicken': 'Chicken with rice & greens',
+                    'vegetarian': 'Beans & vegetables with nshima/rice'
+                };
+                displayText = `Meal Type: ${mealTypes[value] || value}`;
+            } else if (key === 'wasteType') {
+                const wasteTypes = {
+                    'plastics': 'Plastics',
+                    'paper': 'Paper/Cardboard',
+                    'food': 'Food Waste',
+                    'garden': 'Garden Waste',
+                    'mixed': 'Mixed Waste'
+                };
+                displayText = `Waste Type: ${wasteTypes[value] || value}`;
+            } else if (key === 'frequency') {
+                const frequencyTypes = {
+                    'daily': 'Daily',
+                    'weekly': 'Weekly',
+                    'monthly': 'Monthly'
+                };
+                displayText = `Burning Frequency: ${frequencyTypes[value] || value}`;
+            } else {
+                displayText = `${key}: ${value}`;
+            }
+        } else if (typeof value === 'boolean') {
+            displayText = `${key}: ${value ? 'Yes' : 'No'}`;
         }
+        
+        doc.text(displayText, 20, y);
+        y += 7;
     }
 
     // Results section
@@ -500,7 +539,7 @@ async function exportToPDF() {
     y += 10;
     doc.setTextColor(255, 0, 0); // red text
     doc.setFontSize(12);
-	doc.setFont(undefined, 'bold');
+    doc.setFont(undefined, 'bold');
     doc.text(
         `Total Emissions yearly: ${(calculationData.results.total * 12).toFixed(2)} kg CO₂e/Year`,
         12,
@@ -520,6 +559,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
