@@ -44,15 +44,19 @@
         mealsInput.value = value;
     }
 
-    function validateInputs(inputs) {
-        for (const [key, value] of Object.entries(inputs)) {
-            if (isNaN(value) || value < 0) {
-                alert(`Please enter a valid number for ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
-                return false;
-            }
+function validateInputs(inputs) {
+    for (const [key, value] of Object.entries(inputs)) {
+        // Skip validation for non-numeric fields
+        if (typeof value === "string") continue;
+
+        if (isNaN(value) || value < 0) {
+            alert(`Please enter a valid number for ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+            return false;
         }
-        return true;
     }
+    return true;
+}
+
 //save to firestore
 async function saveCalculation(inputs, results, type) {
     try {
@@ -516,6 +520,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
