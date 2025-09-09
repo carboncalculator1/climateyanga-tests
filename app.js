@@ -1,6 +1,11 @@
     let currentSection = 'personal';
     let calculationData = {};
     // Add to the emission factors at the top (after line 3)
+	const mealEmissionFactors = {
+    beef: 7,        // kg CO₂e per serving (average of 6-8)
+    chicken: 2.5,   // kg CO₂e per serving (average of 2-3)  
+    vegetarian: 1.2 // kg CO₂e per serving (average of 0.8-1.5)
+	};
     const emissionFactors = {
         openAir: {
             plastics: 2.5,    // kg CO₂e per kg
@@ -77,33 +82,36 @@ async function saveCalculation(inputs, results, type) {
 }
 
 
-   async function calculatePersonal() {
-        const inputs = {
-            commute: parseFloat(document.getElementById('commuteValue').textContent),
-            waste: parseFloat(document.getElementById('wasteValue').textContent),
-            electricity: parseFloat(document.getElementById('electricityValue').textContent),
-            meals: parseFloat(document.getElementById('meals').value)
-        };
+async function calculatePersonal() {
+    const inputs = {
+        commute: parseFloat(document.getElementById('commuteValue').textContent),
+        waste: parseFloat(document.getElementById('wasteValue').textContent),
+        electricity: parseFloat(document.getElementById('electricityValue').textContent),
+        meals: parseFloat(document.getElementById('meals').value),
+        mealType: document.getElementById('mealType').value
+    };
 
-        if (!validateInputs(inputs)) return;
+    if (!validateInputs(inputs)) return;
 
-        // Convert weekly/daily inputs to monthly values
-        const results = {
-            Commute: inputs.commute * 0.26 * 22, // 22 working days per month
-            Waste: inputs.waste * 0.8 * 4, // Convert weekly to monthly (4 weeks)
-            Electricity: inputs.electricity * 0.02, // Already monthly
-            Meals: inputs.meals * 0.45 * 30 // Daily to monthly (30 days)
-        };
+    // Get emission factor for selected meal type
+    const mealEmissionFactor = mealEmissionFactors[inputs.mealType];
+    
+    // Convert weekly/daily inputs to monthly values
+    const results = {
+        Commute: inputs.commute * 0.26 * 22, // 22 working days per month
+        Waste: inputs.waste * 0.8 * 4, // Convert weekly to monthly (4 weeks)
+        Electricity: inputs.electricity * 0.02, // Already monthly
+        Meals: inputs.meals * mealEmissionFactor * 30 // Daily to monthly (30 days)
+    };
 
-        results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
-        calculationData = { inputs, results };
-	// After calculation
-    	const saved = await saveCalculation(inputs, results, 'personal');
-    	
-
-        displayResults(results);
-
-    }
+    results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
+    calculationData = { inputs, results };
+    
+    // After calculation
+    const saved = await saveCalculation(inputs, results, 'personal');
+    
+    displayResults(results);
+}
 
    async function calculateConstruction() {
         const inputs = {
@@ -508,6 +516,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
