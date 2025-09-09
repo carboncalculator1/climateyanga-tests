@@ -1304,5 +1304,27 @@
   margin: 0; /* remove default spacing */
 }
 
+.meal-type-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1em;
+    background-color: white;
+    cursor: pointer;
+}
+
+.meal-type-select:focus {
+    border-color: #28a745;
+    outline: none;
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}
+
+/* Style for options with emojis */
+.meal-type-select option {
+    font-size: 1.1em;
+    padding: 8px;
+}
+
 
 
