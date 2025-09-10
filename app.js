@@ -524,6 +524,17 @@ async function exportToPDF() {
                     'monthly': 'Monthly'
                 };
                 displayText = `Burning Frequency: ${frequencyTypes[value] || value}`;
+            } else if (key === 'commuteType') {
+                const frequencyTypes = {
+                    'walking': 'Walk',
+					'bicycle': 'Bicycle',
+					'motorbike': 'Motorbike',
+					'carSmall': 'Small vehicle',
+					'carMedium': 'Medium vehicle',
+					'carLarge': 'Large vehicle',
+					'carElectric': 'Electrical Vehicle',
+                };
+                displayText = `Burning Frequency: ${commuteTypes[value] || value}`;
             } else {
                 displayText = `${key}: ${value}`;
             }
@@ -574,6 +585,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
