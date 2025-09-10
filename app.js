@@ -532,7 +532,7 @@ async function exportToPDF() {
 					'carSmall': 'Small vehicle',
 					'carMedium': 'Medium vehicle',
 					'carLarge': 'Large vehicle',
-					'carElectric': 'Electrical Vehicle',
+					'carElectric': 'Electrical Vehicle'
                 };
                 displayText = `Commute Type: ${commuteTypes[value] || value}`;
             } else {
@@ -585,6 +585,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
