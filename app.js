@@ -111,7 +111,7 @@ async function calculatePersonal() {
 
     // Get emission factor for selected meal type
     const mealEmissionFactor = mealEmissionFactors[inputs.mealType];
-	const commuteEmissionFactors = commuteEmissionFactors[inputs.commuteType];
+	const commuteEmissionFactor = commuteEmissionFactors[inputs.commuteType];
 	
 	
     
@@ -574,6 +574,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
