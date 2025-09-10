@@ -61,6 +61,26 @@
         </div>
 
         <div id="personal" class="section active">
+						<!-- Transport control -->
+			<div class="input-group">
+    			<label>
+        			<i class="fas fa-utensils icon"></i>
+        			Transportation Type
+        			<span class="tooltip">
+            		<i class="fas fa-info-circle"></i>
+            			<span class="tooltiptext">Select the type of transportation you typically use</span>
+       				 </span>
+    			</label>
+   			 <select id="commuteType" class="meal-type-select">
+        			<option value="beef" data-icon="🚶‍➡️">🚶‍➡️Walk</option>
+				<option value="beef" data-icon="🚴‍♂️">🚴‍♂️Bicycle</option>
+				<option value="beef" data-icon="🏍️">🏍️Motorbike</option>
+				<option value="beef" data-icon="🚗">🚗Small vehicle</option>
+				<option value="beef" data-icon="🚙">🚙Medium vehicle</option>
+        			<option value="chicken" data-icon="🚌">🚌 Large vehicle</option>
+        			<option value="vegetarian" data-icon="⚡🚗">⚡🚗Electric Vehicle</option>
+    		</select>
+			</div>
             <div class="input-group">
                 <label>
                     <i class="fas fa-car icon"></i>
@@ -118,7 +138,7 @@
                     <button class="meals-btn" onclick="changeMeals(1)">+</button>
                 </div>
             </div>
-			<!-- Add to index.html in the personal section after the meals control -->
+			<!--meals control -->
 			<div class="input-group">
     			<label>
         			<i class="fas fa-utensils icon"></i>
