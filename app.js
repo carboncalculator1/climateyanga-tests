@@ -111,6 +111,9 @@ async function calculatePersonal() {
 
     // Get emission factor for selected meal type
     const mealEmissionFactor = mealEmissionFactors[inputs.mealType];
+	const commuteEmissionFactors = commuteEmissionFactors[inputs.commuteType];
+	
+	
     
     // Convert weekly/daily inputs to monthly values
     const results = {
@@ -571,6 +574,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
