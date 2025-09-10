@@ -525,7 +525,7 @@ async function exportToPDF() {
                 };
                 displayText = `Burning Frequency: ${frequencyTypes[value] || value}`;
             } else if (key === 'commuteType') {
-                const frequencyTypes = {
+                const commuteTypes = {
                     'walking': 'Walk',
 					'bicycle': 'Bicycle',
 					'motorbike': 'Motorbike',
@@ -585,6 +585,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
