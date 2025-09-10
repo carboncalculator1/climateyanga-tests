@@ -534,7 +534,7 @@ async function exportToPDF() {
 					'carLarge': 'Large vehicle',
 					'carElectric': 'Electrical Vehicle',
                 };
-                displayText = `Burning Frequency: ${commuteTypes[value] || value}`;
+                displayText = `Commute Type: ${commuteTypes[value] || value}`;
             } else {
                 displayText = `${key}: ${value}`;
             }
@@ -585,6 +585,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
