@@ -1,11 +1,22 @@
     let currentSection = 'personal';
     let calculationData = {};
-    // Add to the emission factors at the top (after line 3)
+
 	const mealEmissionFactors = {
     beef: 7,        // kg CO₂e per serving (average of 6-8)
     chicken: 2.5,   // kg CO₂e per serving (average of 2-3)  
     vegetarian: 1.2 // kg CO₂e per serving (average of 0.8-1.5)
 	};
+
+	const commuteEmissionFactors = {
+	walking: 0,
+	bicycle: 0,
+	motorbike: 0.078,
+	carSmall: 0.100,
+	carMedium: 0.113,
+	carLarge: 0.140,
+	carElectric: 0.040
+	};
+
     const emissionFactors = {
         openAir: {
             plastics: 2.5,    // kg CO₂e per kg
@@ -89,6 +100,7 @@ async function saveCalculation(inputs, results, type) {
 async function calculatePersonal() {
     const inputs = {
         commute: parseFloat(document.getElementById('commuteValue').textContent),
+		commuteType: document.getElementById('commuteType').value,
         waste: parseFloat(document.getElementById('wasteValue').textContent),
         electricity: parseFloat(document.getElementById('electricityValue').textContent),
         meals: parseFloat(document.getElementById('meals').value),
@@ -102,7 +114,7 @@ async function calculatePersonal() {
     
     // Convert weekly/daily inputs to monthly values
     const results = {
-        Commute: inputs.commute * 0.26 * 22, // 22 working days per month
+        Commute: inputs.commute * commuteEmissionFactors * 0.26 * 22, // 22 working days per month
         Waste: inputs.waste * 0.8 * 4, // Convert weekly to monthly (4 weeks)
         Electricity: inputs.electricity * 0.02, // Already monthly
         Meals: inputs.meals * mealEmissionFactor * 30 // Daily to monthly (30 days)
@@ -559,6 +571,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
