@@ -109,29 +109,80 @@ async function saveCalculation(inputs, results, type) {
 
 
 async function calculatePersonal() {
+    // Get waste inputs
+    const wasteInputs = {
+        food: {
+            generated: parseFloat(document.getElementById('foodWaste').value) || 0,
+            recycled: document.getElementById('foodRecycled').checked ? 
+                     (parseFloat(document.getElementById('foodRecycledAmount').value) || 0) : 0
+        },
+        paper: {
+            generated: parseFloat(document.getElementById('paperWaste').value) || 0,
+            recycled: document.getElementById('paperRecycled').checked ? 
+                     (parseFloat(document.getElementById('paperRecycledAmount').value) || 0) : 0
+        },
+        plastic: {
+            generated: parseFloat(document.getElementById('plasticWaste').value) || 0,
+            recycled: document.getElementById('plasticRecycled').checked ? 
+                     (parseFloat(document.getElementById('plasticRecycledAmount').value) || 0) : 0
+        },
+        metal: {
+            generated: parseFloat(document.getElementById('metalWaste').value) || 0,
+            recycled: document.getElementById('metalRecycled').checked ? 
+                     (parseFloat(document.getElementById('metalRecycledAmount').value) || 0) : 0
+        }
+    };
+
+    // Validate waste inputs
+    for (const [type, data] of Object.entries(wasteInputs)) {
+        if (data.recycled > data.generated) {
+            alert(`Recycled amount cannot exceed generated amount for ${type} waste`);
+            return;
+        }
+    }
+
     const inputs = {
         commute: parseFloat(document.getElementById('commuteValue').textContent),
-		commuteType: document.getElementById('commuteType').value,
-        waste: parseFloat(document.getElementById('wasteValue').textContent),
+        commuteType: document.getElementById('commuteType').value,
         electricity: parseFloat(document.getElementById('electricityValue').textContent),
         meals: parseFloat(document.getElementById('meals').value),
         mealType: document.getElementById('mealType').value,
-		wasteType: document.getElementById('wasteType').value
+        waste: wasteInputs  // Store the waste inputs object
     };
 
     if (!validateInputs(inputs)) return;
 
-    // Get emission factor for selected meal type
+    // Get emission factors
     const mealEmissionFactor = mealEmissionFactors[inputs.mealType];
-	const commuteEmissionFactor = commuteEmissionFactors[inputs.commuteType];
-	const wasteEmissionFactor = wasteEmissionFactors[inputs.wasteType];
-	
-	
+    const commuteEmissionFactor = commuteEmissionFactors[inputs.commuteType];
     
-    // Convert weekly/daily inputs to monthly values
+    // Calculate waste emissions
+    let totalWasteEmissions = 0;
+    
+    // Food waste
+    const foodNet = inputs.waste.food.generated - inputs.waste.food.recycled;
+    totalWasteEmissions += foodNet * wasteEmissionFactors.foodWaste;
+    totalWasteEmissions += inputs.waste.food.recycled * wasteEmissionFactors.foodRecycling;
+    
+    // Paper waste
+    const paperNet = inputs.waste.paper.generated - inputs.waste.paper.recycled;
+    totalWasteEmissions += paperNet * wasteEmissionFactors.paperWaste;
+    totalWasteEmissions += inputs.waste.paper.recycled * wasteEmissionFactors.paperRecycling;
+    
+    // Plastic waste
+    const plasticNet = inputs.waste.plastic.generated - inputs.waste.plastic.recycled;
+    totalWasteEmissions += plasticNet * wasteEmissionFactors.plasticWaste;
+    totalWasteEmissions += inputs.waste.plastic.recycled * wasteEmissionFactors.plasticRecycling;
+    
+    // Metal waste
+    const metalNet = inputs.waste.metal.generated - inputs.waste.metal.recycled;
+    totalWasteEmissions += metalNet * wasteEmissionFactors.metalWaste;
+    totalWasteEmissions += inputs.waste.metal.recycled * wasteEmissionFactors.metalRecycling;
+    
+    // Convert weekly inputs to monthly values
     const results = {
         Commute: inputs.commute * commuteEmissionFactor * 22, // 22 working days per month
-        Waste: inputs.waste * wasteEmissionFactor * 0.8 * 4, // Convert weekly to monthly (4 weeks)
+        Waste: totalWasteEmissions * 4, // Convert weekly to monthly (4 weeks)
         Electricity: inputs.electricity * 0.02, // Already monthly
         Meals: inputs.meals * mealEmissionFactor * 30 // Daily to monthly (30 days)
     };
@@ -144,6 +195,29 @@ async function calculatePersonal() {
     
     displayResults(results);
 }
+
+// Enable/disable recycling amount inputs based on checkbox state
+document.addEventListener('DOMContentLoaded', function() {
+    const recyclingCheckboxes = [
+        'foodRecycled', 'paperRecycled', 'plasticRecycled', 'metalRecycled'
+    ];
+    
+    recyclingCheckboxes.forEach(checkboxId => {
+        const checkbox = document.getElementById(checkboxId);
+        const amountInput = document.getElementById(checkboxId + 'Amount');
+        
+        // Set initial state
+        amountInput.disabled = !checkbox.checked;
+        
+        // Add change listener
+        checkbox.addEventListener('change', function() {
+            amountInput.disabled = !this.checked;
+            if (!this.checked) {
+                amountInput.value = '0';
+            }
+        });
+    });
+});
 
    async function calculateConstruction() {
         const inputs = {
@@ -598,6 +672,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
