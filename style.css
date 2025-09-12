@@ -1400,4 +1400,41 @@
     background: #218838;
 }
 
+.waste-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.waste-type-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.waste-type-input label {
+    min-width: 100px;
+    font-weight: 500;
+}
+
+.waste-input, .recycle-input {
+    width: 80px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.recycle-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 10px;
+}
+
+.recycle-input {
+    margin-left: 5px;
+}
+
 
