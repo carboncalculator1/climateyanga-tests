@@ -669,5 +669,77 @@ async function exportToPDF() {
     doc.save(`${username}_emissions_summary.pdf`);
 }
 
+// ESG Appointment functionality
+document.addEventListener('DOMContentLoaded', function() {
+  // Get modal elements
+  const modal = document.getElementById('esgModal');
+  const esgBtn = document.getElementById('esgBtn');
+  const closeBtn = document.getElementsByClassName('close')[0];
+  const appointmentForm = document.getElementById('appointmentForm');
+  const snackbar = document.getElementById('snackbar');
+
+  // Open modal when ESG button is clicked
+  esgBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    modal.style.display = 'block';
+  });
+
+  // Close modal when X is clicked
+  closeBtn.addEventListener('click', function() {
+    modal.style.display = 'none';
+  });
+
+  // Close modal when clicking outside
+  window.addEventListener('click', function(event) {
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  });
+
+  // Handle form submission
+  appointmentForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Get form values
+    const fullName = document.getElementById('fullName').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const province = document.getElementById('province').value;
+    
+    // Validate all fields are filled
+    if (!fullName || !email || !phone || !province) {
+      alert('Please fill all required fields');
+      return;
+    }
+    
+    try {
+      // Save appointment to Firestore
+      await db.collection('appointments').add({
+        fullName,
+        email,
+        phone,
+        province,
+        status: 'Pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      // Show success message
+      showSnackbar();
+      
+      // Close modal and reset form
+      modal.style.display = 'none';
+      appointmentForm.reset();
+    } catch (error) {
+      console.error('Error saving appointment:', error);
+      alert('Error requesting appointment. Please try again.');
+    }
+  });
+
+  // Function to show snackbar
+  function showSnackbar() {
+    snackbar.className = 'show';
+    setTimeout(function(){ snackbar.className = snackbar.className.replace('show', ''); }, 3000);
+  }
+});
 
 
