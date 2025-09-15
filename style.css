@@ -1579,18 +1579,28 @@
   border: 1px solid #ddd;
 }
 
+/* Improved Appointment Details Styling */
 .appointment-detail-card {
-  padding: 15px;
+  padding: 20px;
   background-color: #f9f9f9;
-  border-radius: 4px;
+  border-radius: 8px;
+  line-height: 1.6;
 }
 
 .appointment-detail-card p {
-  margin: 10px 0;
+  margin: 15px 0;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
 }
 
-#appointmentDetailsModal {
-  display: none;
+.appointment-detail-card p:last-child {
+  border-bottom: none;
+}
+
+.appointment-detail-card strong {
+  display: inline-block;
+  min-width: 120px;
+  color: #2c5aa0;
 }
 
 
