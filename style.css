@@ -1585,6 +1585,8 @@
   background-color: #f9f9f9;
   border-radius: 8px;
   line-height: 1.6;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .appointment-detail-card p {
@@ -1623,5 +1625,6 @@
 .appointment-details-list dt::after {
   content: ":";
 }
+
 
 
