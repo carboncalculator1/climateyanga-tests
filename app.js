@@ -513,7 +513,7 @@ function displayOpenAirResults(data) {
         return `<i class="${icons[category] || 'fas fa-circle'}"></i>`;
     }
 
-// PDF export function
+
 // PDF export function
 async function exportToPDF() {
     const user = auth.currentUser;
@@ -596,12 +596,12 @@ async function exportToPDF() {
             } else if (key === 'commuteType') {
                 const commuteTypes = {
                     'walking': 'Walk',
-					'bicycle': 'Bicycle',
-					'motorbike': 'Motorbike',
-					'carSmall': 'Small vehicle',
-					'carMedium': 'Medium vehicle',
-					'carLarge': 'Large vehicle',
-					'carElectric': 'Electrical Vehicle'
+                    'bicycle': 'Bicycle',
+                    'motorbike': 'Motorbike',
+                    'carSmall': 'Small vehicle',
+                    'carMedium': 'Medium vehicle',
+                    'carLarge': 'Large vehicle',
+                    'carElectric': 'Electrical Vehicle'
                 };
                 displayText = `Commute Type: ${commuteTypes[value] || value}`;
             } else {
@@ -609,6 +609,20 @@ async function exportToPDF() {
             }
         } else if (typeof value === 'boolean') {
             displayText = `${key}: ${value ? 'Yes' : 'No'}`;
+        } else if (typeof value === 'object' && value !== null) {
+            // Handle waste inputs for personal section
+            if (key === 'waste') {
+                doc.text('Waste Generated (kg/week):', 20, y);
+                y += 7;
+                
+                // Display each waste type
+                for (const [wasteType, wasteAmount] of Object.entries(value)) {
+                    const formattedType = wasteType.charAt(0).toUpperCase() + wasteType.slice(1);
+                    doc.text(`  ${formattedType}: ${wasteAmount.toFixed(2)} kg`, 25, y);
+                    y += 7;
+                }
+                continue; // Skip the regular display for waste object
+            }
         }
         
         doc.text(displayText, 20, y);
@@ -654,29 +668,3 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
