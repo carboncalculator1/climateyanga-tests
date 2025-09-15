@@ -1603,4 +1603,25 @@
   color: #2c5aa0;
 }
 
+.appointment-details-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+}
+
+.appointment-details-list dt {
+  font-weight: bold;
+  color: #2c5aa0;
+  grid-column: 1;
+}
+
+.appointment-details-list dd {
+  margin: 0;
+  grid-column: 2;
+}
+
+.appointment-details-list dt::after {
+  content: ":";
+}
+
 
