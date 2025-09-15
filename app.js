@@ -178,29 +178,6 @@ async function calculatePersonal() {
     displayResults(results);
 }
 
-// Enable/disable recycling amount inputs based on checkbox state
-document.addEventListener('DOMContentLoaded', function() {
-    const recyclingCheckboxes = [
-        'foodRecycled', 'paperRecycled', 'plasticRecycled', 'metalRecycled'
-    ];
-    
-    recyclingCheckboxes.forEach(checkboxId => {
-        const checkbox = document.getElementById(checkboxId);
-        const amountInput = document.getElementById(checkboxId + 'Amount');
-        
-        // Set initial state
-        amountInput.disabled = !checkbox.checked;
-        
-        // Add change listener
-        checkbox.addEventListener('change', function() {
-            amountInput.disabled = !this.checked;
-            if (!this.checked) {
-                amountInput.value = '0';
-            }
-        });
-    });
-});
-
    async function calculateConstruction() {
         const inputs = {
             embodiedCarbon: parseFloat(document.getElementById('embodiedCarbonValue').textContent),
@@ -743,5 +720,106 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// Combine into one DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Recycling checkbox functionality
+    const recyclingCheckboxes = [
+        'foodRecycled', 'paperRecycled', 'plasticRecycled', 'metalRecycled'
+    ];
+    
+    recyclingCheckboxes.forEach(checkboxId => {
+        const checkbox = document.getElementById(checkboxId);
+        const amountInput = document.getElementById(checkboxId + 'Amount');
+        
+        if (checkbox && amountInput) {
+            // Set initial state
+            amountInput.disabled = !checkbox.checked;
+            
+            // Add change listener
+            checkbox.addEventListener('change', function() {
+                amountInput.disabled = !this.checked;
+                if (!this.checked) {
+                    amountInput.value = '0';
+                }
+            });
+        }
+    });
+
+    // 2. ESG Appointment functionality
+    const modal = document.getElementById('esgModal');
+    const esgBtn = document.getElementById('esgBtn');
+    const closeBtn = document.querySelector('.modal .close'); // More specific selector
+    const appointmentForm = document.getElementById('appointmentForm');
+    const snackbar = document.getElementById('snackbar');
+
+    // Only set up ESG functionality if elements exist
+    if (modal && esgBtn && closeBtn && appointmentForm && snackbar) {
+        // Open modal when ESG button is clicked
+        esgBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            modal.style.display = 'block';
+        });
+
+        // Close modal when X is clicked
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Handle form submission
+        appointmentForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const province = document.getElementById('province').value;
+            
+            // Validate all fields are filled
+            if (!fullName || !email || !phone || !province) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            try {
+                // Save appointment to Firestore
+                await db.collection('appointments').add({
+                    fullName,
+                    email,
+                    phone,
+                    province,
+                    status: 'Pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Show success message
+                showSnackbar();
+                
+                // Close modal and reset form
+                modal.style.display = 'none';
+                appointmentForm.reset();
+            } catch (error) {
+                console.error('Error saving appointment:', error);
+                alert('Error requesting appointment. Please try again.');
+            }
+        });
+
+        // Function to show snackbar
+        function showSnackbar() {
+            snackbar.className = 'show';
+            setTimeout(function(){ 
+                snackbar.className = snackbar.className.replace('show', ''); 
+            }, 3000);
+        }
+    }
+});
 
 
