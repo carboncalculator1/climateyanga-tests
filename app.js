@@ -550,7 +550,7 @@ async function exportToPDF() {
     // === CALCULATION DETAILS BOX ===
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
-    doc.rect(10, 40, 190, 110); // outer box
+    doc.rect(10, 40, 190, 120); // outer box
     doc.line(10, 50, 200, 50); // line after header
     doc.text('Calculation Details', 12, 47);
 
@@ -668,3 +668,4 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
