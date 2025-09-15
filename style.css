@@ -1497,8 +1497,8 @@
 /* Modal Styles */
 .modal {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center;   /* horizontal centering */
+  align-items: center;       /* vertical centering */
   position: fixed;
   z-index: 1000;
   left: 0;
@@ -1508,14 +1508,16 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+/* Content Box */
 .modal-content {
   background-color: #fefefe;
-  margin: 0;
   padding: 20px;
   border-radius: 8px;
   width: 90%;
   max-width: 500px;
   position: relative;
+  margin: 0;                 /* no auto margin needed when using flexbox */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* optional polish */
 }
 
 .close {
@@ -1586,6 +1588,7 @@
 .appointment-detail-card p {
   margin: 10px 0;
 }
+
 
 
 
