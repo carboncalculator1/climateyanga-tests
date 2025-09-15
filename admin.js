@@ -1,4 +1,6 @@
 // admin.js
+let appointmentsModal;
+let appointmentsCloseBtn;
 
 document.addEventListener('DOMContentLoaded', function() {
     // Check if user is admin
@@ -38,6 +40,24 @@ document.addEventListener('DOMContentLoaded', function() {
             loadAdminData();
         });
     });
+    // Initialize appointment modal elements
+  appointmentsModal = document.getElementById('appointmentDetailsModal');
+  appointmentsCloseBtn = document.getElementsByClassName('close')[1];
+  
+  // Close modal when X is clicked
+  appointmentsCloseBtn.addEventListener('click', function() {
+    appointmentsModal.style.display = 'none';
+  });
+  
+  // Close modal when clicking outside
+  window.addEventListener('click', function(event) {
+    if (event.target == appointmentsModal) {
+      appointmentsModal.style.display = 'none';
+    }
+  });
+  
+  // Load appointments data
+  loadAppointments();
 });
 
 const mealTypeLabels = {
@@ -378,3 +398,104 @@ const wasteEmissionFactors = {
     plasticWaste: -0.2,
     metalWaste: 9.0
 };
+
+// Function to load appointments
+async function loadAppointments() {
+  try {
+    const appointmentsSnapshot = await db.collection('appointments')
+      .orderBy('createdAt', 'desc')
+      .get();
+    
+    const appointmentsTableBody = document.getElementById('appointmentsTableBody');
+    appointmentsTableBody.innerHTML = '';
+    
+    appointmentsSnapshot.forEach(doc => {
+      const appointment = doc.data();
+      const row = document.createElement('tr');
+      
+      row.innerHTML = `
+        <td>${appointment.fullName}</td>
+        <td>${appointment.email}</td>
+        <td>${appointment.phone}</td>
+        <td>${appointment.province}</td>
+        <td>${appointment.createdAt ? appointment.createdAt.toDate().toLocaleDateString() : 'N/A'}</td>
+        <td>
+          <select class="status-select" data-id="${doc.id}">
+            <option value="Pending" ${appointment.status === 'Pending' ? 'selected' : ''}>Pending</option>
+            <option value="Completed" ${appointment.status === 'Completed' ? 'selected' : ''}>Completed</option>
+          </select>
+        </td>
+        <td>
+          <button class="view-appointment-btn" data-id="${doc.id}">View Details</button>
+        </td>
+      `;
+      
+      appointmentsTableBody.appendChild(row);
+    });
+    
+    // Add event listeners for status changes
+    document.querySelectorAll('.status-select').forEach(select => {
+      select.addEventListener('change', function() {
+        const appointmentId = this.getAttribute('data-id');
+        const newStatus = this.value;
+        updateAppointmentStatus(appointmentId, newStatus);
+      });
+    });
+    
+    // Add event listeners for view buttons
+    document.querySelectorAll('.view-appointment-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const appointmentId = this.getAttribute('data-id');
+        viewAppointmentDetails(appointmentId);
+      });
+    });
+    
+  } catch (error) {
+    console.error('Error loading appointments:', error);
+  }
+}
+
+// Function to update appointment status
+async function updateAppointmentStatus(appointmentId, newStatus) {
+  try {
+    await db.collection('appointments').doc(appointmentId).update({
+      status: newStatus
+    });
+    
+    // Optional: Show a confirmation message
+    console.log('Appointment status updated successfully');
+  } catch (error) {
+    console.error('Error updating appointment status:', error);
+    alert('Error updating status. Please try again.');
+  }
+}
+
+// Function to view appointment details
+async function viewAppointmentDetails(appointmentId) {
+  try {
+    const appointmentDoc = await db.collection('appointments').doc(appointmentId).get();
+    
+    if (!appointmentDoc.exists) {
+      alert('Appointment not found.');
+      return;
+    }
+    
+    const appointment = appointmentDoc.data();
+    
+    const detailsHtml = `
+      <div class="appointment-detail-card">
+        <p><strong>Name:</strong> ${appointment.fullName}</p>
+        <p><strong>Email:</strong> ${appointment.email}</p>
+        <p><strong>Phone:</strong> ${appointment.phone}</p>
+        <p><strong>Province:</strong> ${appointment.province}</p>
+        <p><strong>Status:</strong> ${appointment.status}</p>
+        <p><strong>Request Date:</strong> ${appointment.createdAt ? appointment.createdAt.toDate().toLocaleString() : 'N/A'}</p>
+      </div>
+    `;
+    
+    document.getElementById('appointmentDetailsContent').innerHTML = detailsHtml;
+    appointmentsModal.style.display = 'block';
+  } catch (error) {
+    console.error('Error fetching appointment details:', error);
+  }
+}
