@@ -95,59 +95,67 @@
                     <span class="slider-value" id="commuteValue">20</span>
                 </div>
             </div>
-    <!-- Enhanced Waste Input Section -->
-    <div class="input-group">
-        <label>
-            <i class="fas fa-trash icon"></i>
-            Waste Generated per Week
-            <span class="tooltip">
-                <i class="fas fa-info-circle"></i>
-                <span class="tooltiptext">Enter your weekly waste generation by type and recycling</span>
-            </span>
-        </label>
+<!-- Enhanced Waste Input Section -->
+<div class="input-group">
+    <label>
+        <i class="fas fa-trash icon"></i>
+        Waste Generated per Week
+        <span class="tooltip">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltiptext">Enter your weekly waste generation by type</span>
+        </span>
+    </label>
+    
+    <div class="waste-input-container">
+        <!-- Food Waste -->
+        <div class="waste-type-input">
+            <label>
+                <i class="fas fa-apple-alt icon"></i>
+                Food Waste (kg)
+            </label>
+            <div class="slider-container">
+                <input type="range" class="slider" min="0" max="20" value="0" step="0.1" oninput="updateSliderValue(this, 'foodWasteValue')">
+                <span class="slider-value" id="foodWasteValue">0</span>
+            </div>
+        </div>
         
-        <div class="waste-input-container">
-            <!-- Food Waste -->
-            <div class="waste-type-input">
-                <label>Food Waste (kg)</label>
-                <input type="number" id="foodWaste" min="0" step="0.1" value="0" class="waste-input">
-                <label class="recycle-label">
-                    <input type="checkbox" id="foodRecycled"> Recycled
-                </label>
-                <input type="number" id="foodRecycledAmount" min="0" step="0.1" value="0" class="recycle-input" placeholder="Recycled kg">
+        <!-- Paper Waste -->
+        <div class="waste-type-input">
+            <label>
+                <i class="fas fa-file-alt icon"></i>
+                Paper Waste (kg)
+            </label>
+            <div class="slider-container">
+                <input type="range" class="slider" min="0" max="20" value="0" step="0.1" oninput="updateSliderValue(this, 'paperWasteValue')">
+                <span class="slider-value" id="paperWasteValue">0</span>
             </div>
-            
-            <!-- Paper Waste -->
-            <div class="waste-type-input">
-                <label>Paper Waste (kg)</label>
-                <input type="number" id="paperWaste" min="0" step="0.1" value="0" class="waste-input">
-                <label class="recycle-label">
-                    <input type="checkbox" id="paperRecycled"> Recycled
-                </label>
-                <input type="number" id="paperRecycledAmount" min="0" step="0.1" value="0" class="recycle-input" placeholder="Recycled kg">
+        </div>
+        
+        <!-- Plastic Waste -->
+        <div class="waste-type-input">
+            <label>
+                <i class="fas fa-wine-bottle icon"></i>
+                Plastic Waste (kg)
+            </label>
+            <div class="slider-container">
+                <input type="range" class="slider" min="0" max="20" value="0" step="0.1" oninput="updateSliderValue(this, 'plasticWasteValue')">
+                <span class="slider-value" id="plasticWasteValue">0</span>
             </div>
-            
-            <!-- Plastic Waste -->
-            <div class="waste-type-input">
-                <label>Plastic Waste (kg)</label>
-                <input type="number" id="plasticWaste" min="0" step="0.1" value="0" class="waste-input">
-                <label class="recycle-label">
-                    <input type="checkbox" id="plasticRecycled"> Recycled
-                </label>
-                <input type="number" id="plasticRecycledAmount" min="0" step="0.1" value="0" class="recycle-input" placeholder="Recycled kg">
-            </div>
-            
-            <!-- Metal Waste -->
-            <div class="waste-type-input">
-                <label>Metal Waste (kg)</label>
-                <input type="number" id="metalWaste" min="0" step="0.1" value="0" class="waste-input">
-                <label class="recycle-label">
-                    <input type="checkbox" id="metalRecycled"> Recycled
-                </label>
-                <input type="number" id="metalRecycledAmount" min="0" step="0.1" value="0" class="recycle-input" placeholder="Recycled kg">
+        </div>
+        
+        <!-- Metal Waste -->
+        <div class="waste-type-input">
+            <label>
+                <i class="fas fa-wrench icon"></i>
+                Metal Waste (kg)
+            </label>
+            <div class="slider-container">
+                <input type="range" class="slider" min="0" max="20" value="0" step="0.1" oninput="updateSliderValue(this, 'metalWasteValue')">
+                <span class="slider-value" id="metalWasteValue">0</span>
             </div>
         </div>
     </div>
+</div>
             <div class="input-group">
                 <label>
                     <i class="fas fa-bolt icon"></i>
