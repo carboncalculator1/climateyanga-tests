@@ -1496,7 +1496,9 @@
 
 /* Modal Styles */
 .modal {
-  display: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: fixed;
   z-index: 1000;
   left: 0;
@@ -1508,7 +1510,7 @@
 
 .modal-content {
   background-color: #fefefe;
-  margin: 10% auto;
+  margin: 0;
   padding: 20px;
   border-radius: 8px;
   width: 90%;
@@ -1584,6 +1586,7 @@
 .appointment-detail-card p {
   margin: 10px 0;
 }
+
 
 
 
