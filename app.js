@@ -720,7 +720,8 @@ document.addEventListener('DOMContentLoaded', function() {
         phone,
         province,
         status: 'Pending',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  		updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       
       // Show success message
@@ -741,5 +742,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function(){ snackbar.className = snackbar.className.replace('show', ''); }, 3000);
   }
 });
+
 
 
