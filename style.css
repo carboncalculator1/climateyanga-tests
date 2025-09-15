@@ -1403,38 +1403,28 @@
 .waste-input-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
     margin-top: 10px;
 }
 
 .waste-type-input {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border-left: 4px solid #4CAF50;
 }
 
 .waste-type-input label {
-    min-width: 100px;
-    font-weight: 500;
-}
-
-.waste-input, .recycle-input {
-    width: 80px;
-    padding: 5px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.recycle-label {
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin-left: 10px;
+    gap: 8px;
+    font-weight: 500;
+    color: #333;
 }
 
-.recycle-input {
-    margin-left: 5px;
+.waste-type-input .slider-container {
+    margin-top: 5px;
 }
-
-
