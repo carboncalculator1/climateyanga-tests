@@ -757,7 +757,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Open modal when ESG button is clicked
         esgBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            modal.style.display = 'flex';
+            modal.style.display = 'block';
         });
 
         // Close modal when X is clicked
@@ -821,6 +821,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
 
 
 
