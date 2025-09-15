@@ -484,16 +484,30 @@ async function viewAppointmentDetails(appointmentId) {
     
     const appointment = appointmentDoc.data();
     
-    const detailsHtml = `
-      <div class="appointment-detail-card">
-        <p><strong>Name:</strong> ${appointment.fullName}</p>
-        <p><strong>Email:</strong> ${appointment.email}</p>
-        <p><strong>Phone:</strong> ${appointment.phone}</p>
-        <p><strong>Province:</strong> ${appointment.province}</p>
-        <p><strong>Status:</strong> ${appointment.status}</p>
-        <p><strong>Request Date:</strong> ${appointment.createdAt ? appointment.createdAt.toDate().toLocaleString() : 'N/A'}</p>
-      </div>
-    `;
+    // Replace the detailsHtml in viewAppointmentDetails function with:
+const detailsHtml = `
+  <div class="appointment-detail-card">
+    <dl class="appointment-details-list">
+      <dt>Name:</dt>
+      <dd>${appointment.fullName}</dd>
+      
+      <dt>Email:</dt>
+      <dd>${appointment.email}</dd>
+      
+      <dt>Phone:</dt>
+      <dd>${appointment.phone}</dd>
+      
+      <dt>Province:</dt>
+      <dd>${appointment.province}</dd>
+      
+      <dt>Status:</dt>
+      <dd>${appointment.status}</dd>
+      
+      <dt>Request Date:</dt>
+      <dd>${appointment.createdAt ? appointment.createdAt.toDate().toLocaleString() : 'N/A'}</dd>
+    </dl>
+  </div>
+`;
     
     document.getElementById('appointmentDetailsContent').innerHTML = detailsHtml;
     appointmentsModal.style.display = 'block';
