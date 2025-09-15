@@ -42,19 +42,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     // Initialize appointment modal elements
   appointmentsModal = document.getElementById('appointmentDetailsModal');
-  appointmentsCloseBtn = document.getElementsByClassName('close')[1];
+  appointmentsCloseBtn = document.querySelector('#appointmentDetailsModal .close');
   
   // Close modal when X is clicked
+if (appointmentsCloseBtn) {
   appointmentsCloseBtn.addEventListener('click', function() {
     appointmentsModal.style.display = 'none';
   });
+}
   
   // Close modal when clicking outside
-  window.addEventListener('click', function(event) {
-    if (event.target == appointmentsModal) {
-      appointmentsModal.style.display = 'none';
-    }
-  });
+window.addEventListener('click', function(event) {
+  if (event.target === appointmentsModal) {
+    appointmentsModal.style.display = 'none';
+  }
+});
   
   // Load appointments data
   loadAppointments();
