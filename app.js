@@ -123,10 +123,19 @@ async function calculatePersonal() {
         electricity: parseFloat(document.getElementById('electricityValue').textContent),
         meals: parseFloat(document.getElementById('meals').value),
         mealType: document.getElementById('mealType').value,
-        waste: wasteInputs  // Store the waste inputs object
+        // Don't include the nested waste object for validation
     };
 
-    if (!validateInputs(inputs)) return;
+    // Create a flattened version for validation
+    const validationInputs = {
+        ...inputs,
+        foodWaste: wasteInputs.food,
+        paperWaste: wasteInputs.paper,
+        plasticWaste: wasteInputs.plastic,
+        metalWaste: wasteInputs.metal
+    };
+
+    if (!validateInputs(validationInputs)) return;
 
     // Get emission factors
     const mealEmissionFactor = mealEmissionFactors[inputs.mealType];
@@ -136,16 +145,16 @@ async function calculatePersonal() {
     let totalWasteEmissions = 0;
     
     // Food waste
-    totalWasteEmissions += inputs.waste.food * wasteEmissionFactors.foodWaste;
+    totalWasteEmissions += wasteInputs.food * wasteEmissionFactors.foodWaste;
     
     // Paper waste
-    totalWasteEmissions += inputs.waste.paper * wasteEmissionFactors.paperWaste;
+    totalWasteEmissions += wasteInputs.paper * wasteEmissionFactors.paperWaste;
     
     // Plastic waste
-    totalWasteEmissions += inputs.waste.plastic * wasteEmissionFactors.plasticWaste;
+    totalWasteEmissions += wasteInputs.plastic * wasteEmissionFactors.plasticWaste;
     
     // Metal waste
-    totalWasteEmissions += inputs.waste.metal * wasteEmissionFactors.metalWaste;
+    totalWasteEmissions += wasteInputs.metal * wasteEmissionFactors.metalWaste;
     
     // Convert weekly inputs to monthly values
     const results = {
@@ -156,10 +165,15 @@ async function calculatePersonal() {
     };
 
     results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
-    calculationData = { inputs, results };
+    
+    // Include waste inputs in the calculation data for display/PDF
+    calculationData = { 
+        inputs: {...inputs, waste: wasteInputs}, 
+        results 
+    };
     
     // After calculation
-    const saved = await saveCalculation(inputs, results, 'personal');
+    const saved = await saveCalculation({...inputs, waste: wasteInputs}, results, 'personal');
     
     displayResults(results);
 }
@@ -640,6 +654,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
