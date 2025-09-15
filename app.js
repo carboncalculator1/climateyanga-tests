@@ -109,37 +109,13 @@ async function saveCalculation(inputs, results, type) {
 
 
 async function calculatePersonal() {
-    // Get waste inputs
+    // Get waste inputs from sliders
     const wasteInputs = {
-        food: {
-            generated: parseFloat(document.getElementById('foodWaste').value) || 0,
-            recycled: document.getElementById('foodRecycled').checked ? 
-                     (parseFloat(document.getElementById('foodRecycledAmount').value) || 0) : 0
-        },
-        paper: {
-            generated: parseFloat(document.getElementById('paperWaste').value) || 0,
-            recycled: document.getElementById('paperRecycled').checked ? 
-                     (parseFloat(document.getElementById('paperRecycledAmount').value) || 0) : 0
-        },
-        plastic: {
-            generated: parseFloat(document.getElementById('plasticWaste').value) || 0,
-            recycled: document.getElementById('plasticRecycled').checked ? 
-                     (parseFloat(document.getElementById('plasticRecycledAmount').value) || 0) : 0
-        },
-        metal: {
-            generated: parseFloat(document.getElementById('metalWaste').value) || 0,
-            recycled: document.getElementById('metalRecycled').checked ? 
-                     (parseFloat(document.getElementById('metalRecycledAmount').value) || 0) : 0
-        }
+        food: parseFloat(document.getElementById('foodWasteValue').textContent) || 0,
+        paper: parseFloat(document.getElementById('paperWasteValue').textContent) || 0,
+        plastic: parseFloat(document.getElementById('plasticWasteValue').textContent) || 0,
+        metal: parseFloat(document.getElementById('metalWasteValue').textContent) || 0
     };
-
-    // Validate waste inputs
-    for (const [type, data] of Object.entries(wasteInputs)) {
-        if (data.recycled > data.generated) {
-            alert(`Recycled amount cannot exceed generated amount for ${type} waste`);
-            return;
-        }
-    }
 
     const inputs = {
         commute: parseFloat(document.getElementById('commuteValue').textContent),
@@ -156,28 +132,20 @@ async function calculatePersonal() {
     const mealEmissionFactor = mealEmissionFactors[inputs.mealType];
     const commuteEmissionFactor = commuteEmissionFactors[inputs.commuteType];
     
-    // Calculate waste emissions
+    // Calculate waste emissions (no recycling offsets)
     let totalWasteEmissions = 0;
     
     // Food waste
-    const foodNet = inputs.waste.food.generated - inputs.waste.food.recycled;
-    totalWasteEmissions += foodNet * wasteEmissionFactors.foodWaste;
-    totalWasteEmissions += inputs.waste.food.recycled * wasteEmissionFactors.foodRecycling;
+    totalWasteEmissions += inputs.waste.food * wasteEmissionFactors.foodWaste;
     
     // Paper waste
-    const paperNet = inputs.waste.paper.generated - inputs.waste.paper.recycled;
-    totalWasteEmissions += paperNet * wasteEmissionFactors.paperWaste;
-    totalWasteEmissions += inputs.waste.paper.recycled * wasteEmissionFactors.paperRecycling;
+    totalWasteEmissions += inputs.waste.paper * wasteEmissionFactors.paperWaste;
     
     // Plastic waste
-    const plasticNet = inputs.waste.plastic.generated - inputs.waste.plastic.recycled;
-    totalWasteEmissions += plasticNet * wasteEmissionFactors.plasticWaste;
-    totalWasteEmissions += inputs.waste.plastic.recycled * wasteEmissionFactors.plasticRecycling;
+    totalWasteEmissions += inputs.waste.plastic * wasteEmissionFactors.plasticWaste;
     
     // Metal waste
-    const metalNet = inputs.waste.metal.generated - inputs.waste.metal.recycled;
-    totalWasteEmissions += metalNet * wasteEmissionFactors.metalWaste;
-    totalWasteEmissions += inputs.waste.metal.recycled * wasteEmissionFactors.metalRecycling;
+    totalWasteEmissions += inputs.waste.metal * wasteEmissionFactors.metalWaste;
     
     // Convert weekly inputs to monthly values
     const results = {
@@ -672,6 +640,7 @@ async function exportToPDF() {
     // === SAVE ===
     doc.save(`${username}_emissions_summary.pdf`);
 }
+
 
 
 
