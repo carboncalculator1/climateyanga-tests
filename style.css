@@ -1511,7 +1511,6 @@
 /* Content Box */
 .modal-content {
   background-color: #fefefe;
-  display: flex;
   padding: 20px;
   border-radius: 8px;
   width: 90%;
@@ -1625,6 +1624,7 @@
 .appointment-details-list dt::after {
   content: ":";
 }
+
 
 
 
