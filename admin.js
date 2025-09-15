@@ -488,22 +488,22 @@ async function viewAppointmentDetails(appointmentId) {
 const detailsHtml = `
   <div class="appointment-detail-card">
     <dl class="appointment-details-list">
-      <dt>Name:</dt>
+      <dt>Name</dt>
       <dd>${appointment.fullName}</dd>
       
-      <dt>Email:</dt>
+      <dt>Email</dt>
       <dd>${appointment.email}</dd>
       
-      <dt>Phone:</dt>
+      <dt>Phone</dt>
       <dd>${appointment.phone}</dd>
       
-      <dt>Province:</dt>
+      <dt>Province</dt>
       <dd>${appointment.province}</dd>
       
-      <dt>Status:</dt>
+      <dt>Status</dt>
       <dd>${appointment.status}</dd>
       
-      <dt>Request Date:</dt>
+      <dt>Request Date</dt>
       <dd>${appointment.createdAt ? appointment.createdAt.toDate().toLocaleString() : 'N/A'}</dd>
     </dl>
   </div>
