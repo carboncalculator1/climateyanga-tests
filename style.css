@@ -1496,7 +1496,7 @@
 
 /* Modal Styles */
 .modal {
-  display: none;
+  display: flex;
   position: fixed;
   z-index: 1000;
   left: 0;
@@ -1584,5 +1584,6 @@
 .appointment-detail-card p {
   margin: 10px 0;
 }
+
 
 
