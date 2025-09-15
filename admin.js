@@ -73,6 +73,17 @@ function formatCalculationInputs(inputs, type) {
         if (type === 'personal') {
             if (key === 'mealType') {
                 displayValue = mealTypeLabels[value] || value;
+            } else if (key === 'commuteType') {
+                const commuteTypes = {
+                    'walking': 'Walk',
+                    'bicycle': 'Bicycle',
+                    'motorbike': 'Motorbike',
+                    'carSmall': 'Small vehicle',
+                    'carMedium': 'Medium vehicle',
+                    'carLarge': 'Large vehicle',
+                    'carElectric': 'Electrical Vehicle'
+                };
+                displayValue = commuteTypes[value] || value;
             }
         } else if (type === 'openair') {
             if (key === 'wasteType') {
@@ -87,6 +98,16 @@ function formatCalculationInputs(inputs, type) {
         // Format numeric values
         if (typeof value === 'number') {
             displayValue = value.toFixed(2);
+        }
+        
+        // Handle waste object for personal calculations
+        if (key === 'waste' && typeof value === 'object') {
+            formatted += 'WASTE GENERATED (kg/week):\n';
+            for (const [wasteType, wasteAmount] of Object.entries(value)) {
+                const formattedType = wasteType.charAt(0).toUpperCase() + wasteType.slice(1);
+                formatted += `  ${formattedType}: ${wasteAmount.toFixed(2)} kg\n`;
+            }
+            continue; // Skip the regular display for waste object
         }
         
         formatted += `${key.replace(/([A-Z])/g, ' $1').toUpperCase()}: ${displayValue}\n`;
@@ -283,6 +304,47 @@ async function viewCalculationDetails(userId, calcId) {
         const inputsFormatted = formatCalculationInputs(calculation.inputs, calculation.type);
         const resultsFormatted = formatCalculationResults(calculation.results);
 
+        // Create a more detailed view for personal calculations with waste data
+        let detailedHtml = '';
+        if (calculation.type === 'personal' && calculation.inputs && calculation.inputs.waste) {
+            detailedHtml = `
+                <div class="waste-details">
+                    <h4>Waste Generation Details:</h4>
+                    <table class="waste-table">
+                        <thead>
+                            <tr>
+                                <th>Waste Type</th>
+                                <th>Amount (kg/week)</th>
+                                <th>Monthly Emissions (kg CO₂e)</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            
+            // Calculate emissions for each waste type
+            const wasteData = calculation.inputs.waste;
+            const wasteEmissions = {
+                food: (wasteData.food || 0) * wasteEmissionFactors.foodWaste * 4,
+                paper: (wasteData.paper || 0) * wasteEmissionFactors.paperWaste * 4,
+                plastic: (wasteData.plastic || 0) * wasteEmissionFactors.plasticWaste * 4,
+                metal: (wasteData.metal || 0) * wasteEmissionFactors.metalWaste * 4
+            };
+            
+            for (const [wasteType, amount] of Object.entries(wasteData)) {
+                const formattedType = wasteType.charAt(0).toUpperCase() + wasteType.slice(1);
+                detailedHtml += `
+                    <tr>
+                        <td>${formattedType}</td>
+                        <td>${amount.toFixed(2)}</td>
+                        <td>${wasteEmissions[wasteType].toFixed(2)}</td>
+                    </tr>`;
+            }
+            
+            detailedHtml += `
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+
         const detailsHtml = `
             <div class="calculation-detail-card">
                 <h3>Calculation Details</h3>
@@ -294,6 +356,8 @@ async function viewCalculationDetails(userId, calcId) {
                     <h4>Inputs:</h4>
                     <pre class="formatted-data">${inputsFormatted}</pre>
                 </div>
+                
+                ${detailedHtml}
                 
                 <div class="detail-section">
                     <h4>Results:</h4>
@@ -307,3 +371,10 @@ async function viewCalculationDetails(userId, calcId) {
         console.error('Error fetching calculation details:', error);
     }
 }
+
+const wasteEmissionFactors = {
+    foodWaste: 2.0,
+    paperWaste: 2.8,
+    plasticWaste: -0.2,
+    metalWaste: 9.0
+};
