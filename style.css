@@ -1496,7 +1496,7 @@
 
 /* Modal Styles */
 .modal {
-  display: flex;
+  display: none;
   justify-content: center;   /* horizontal centering */
   align-items: center;       /* vertical centering */
   position: fixed;
@@ -1588,9 +1588,5 @@
 .appointment-detail-card p {
   margin: 10px 0;
 }
-
-
-
-
 
 
