@@ -1430,7 +1430,7 @@
     background-color: #f9f9f9;
     border-radius: 6px;
     border-left: 3px solid #4CAF50;
-    font-size: 0.9em;
+    font-size: 0.5em;
 }
 
 .waste-type-input label {
@@ -1633,6 +1633,7 @@
 .appointment-details-list dt::after {
   content: ":";
 }
+
 
 
 
