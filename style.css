@@ -6,7 +6,6 @@
             border-top: 1px solid #e9ecef;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             width: 96%;
-
 			display: flex;               /* flexbox for centering */
     		justify-content: center;     /* center horizontally */
 		}
@@ -1634,6 +1633,7 @@
 .appointment-details-list dt::after {
   content: ":";
 }
+
 
 
 
