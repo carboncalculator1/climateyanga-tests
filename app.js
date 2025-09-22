@@ -570,9 +570,7 @@ async function exportToPDF() {
                 'hybrid': 'Hybrid'
             };
             displayText = `Electricity Type: ${electricityTypes[value] || value}`;
-        } else if (typeof value === 'string') {
-            // Handle special cases for personal and open-air burning sections
-            if (key === 'mealType') {
+        } else if (key === 'mealType') {
                 const mealTypes = {
                     'beef': 'Beef stew with nshima & vegetables',
                     'chicken': 'Chicken with rice & greens',
@@ -846,6 +844,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
 
 
 
