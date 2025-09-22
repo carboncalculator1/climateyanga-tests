@@ -542,7 +542,7 @@ async function exportToPDF() {
     // === CALCULATION DETAILS BOX ===
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
-    doc.rect(10, 40, 190, 150); // outer box
+    doc.rect(10, 40, 190, 160); // outer box
     doc.line(10, 50, 200, 50); // line after header
     doc.text('Calculation Details', 12, 47);
 
@@ -844,6 +844,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
 
 
 
