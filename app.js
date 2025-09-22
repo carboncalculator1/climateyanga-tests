@@ -1,6 +1,13 @@
     let currentSection = 'personal';
     let calculationData = {};
 
+	const electricityEmissionFactors = {
+	zesco: 0.02, // kg CO₂e per kWh (Zambia grid average)
+	solar: 0.001, // kg CO₂e per kWh (solar PV)
+	generator: 0.25, // kg CO₂e per kWh (diesel generator)
+	hybrid: 0.01 // kg CO₂e per kWh (grid + solar hybrid)
+	};
+
 	const mealEmissionFactors = {
     beef: 7,        // kg CO₂e per serving (average of 6-8)
     chicken: 2.5,   // kg CO₂e per serving (average of 2-3)  
@@ -118,13 +125,13 @@ async function calculatePersonal() {
     };
 
     const inputs = {
-        commute: parseFloat(document.getElementById('commuteValue').textContent),
-        commuteType: document.getElementById('commuteType').value,
-        electricity: parseFloat(document.getElementById('electricityValue').textContent),
-        meals: parseFloat(document.getElementById('meals').value),
-        mealType: document.getElementById('mealType').value,
-        // Don't include the nested waste object for validation
-    };
+    commute: parseFloat(document.getElementById('commuteValue').textContent),
+    commuteType: document.getElementById('commuteType').value,
+    electricity: parseFloat(document.getElementById('electricityValue').textContent),
+    electricityType: document.getElementById('electricityTypePersonal').value, // NEW
+    meals: parseFloat(document.getElementById('meals').value),
+    mealType: document.getElementById('mealType').value,
+};
 
     // Create a flattened version for validation
     const validationInputs = {
@@ -140,6 +147,7 @@ async function calculatePersonal() {
     // Get emission factors
     const mealEmissionFactor = mealEmissionFactors[inputs.mealType];
     const commuteEmissionFactor = commuteEmissionFactors[inputs.commuteType];
+	const electricityEmissionFactor = electricityEmissionFactors[inputs.electricityType]; // NEW
     
     // Calculate waste emissions (no recycling offsets)
     let totalWasteEmissions = 0;
@@ -160,7 +168,7 @@ async function calculatePersonal() {
     const results = {
         Commute: inputs.commute * commuteEmissionFactor * 22, // 22 working days per month
         Waste: totalWasteEmissions * 4, // Convert weekly to monthly (4 weeks)
-        Electricity: inputs.electricity * 0.02, // Already monthly
+       	Electricity: inputs.electricity * electricityEmissionFactor, //New
         Meals: inputs.meals * mealEmissionFactor * 30 // Daily to monthly (30 days)
     };
 
@@ -182,16 +190,20 @@ async function calculatePersonal() {
         const inputs = {
             embodiedCarbon: parseFloat(document.getElementById('embodiedCarbonValue').textContent),
             constructionElectricity: parseFloat(document.getElementById('constructionElectricityValue').textContent),
+			electricityTypeConstruction: document.getElementById('electricityTypeConstruction').value, // NEW
             machinery: parseFloat(document.getElementById('machineryValue').textContent),
             constructionTransport: parseFloat(document.getElementById('constructionTransportValue').textContent)
         };
 
         if (!validateInputs(inputs)) return;
 
+	   // Get electricity emission factor
+		const electricityEmissionFactor = electricityEmissionFactors[inputs.electricityTypeConstruction]; // NEW
+
         // Convert weekly inputs to monthly values
         const results = {
             Materials: inputs.embodiedCarbon * 2.7, // Already monthly
-            Electricity: inputs.constructionElectricity * 0.02, // Already monthly
+            Electricity: inputs.constructionElectricity * electricityEmissionFactor, // New
             Machinery: inputs.machinery * 0.26 * 4, // Convert weekly to monthly (4 weeks)
             Transport: inputs.constructionTransport * 0.26 * 4 // Convert weekly to monthly (4 weeks)
         };
@@ -211,17 +223,20 @@ async function calculatePersonal() {
         const inputs = {
             rawMaterial: parseFloat(document.getElementById('rawMaterialValue').textContent),
             manufacturingEnergy: parseFloat(document.getElementById('manufacturingEnergyValue').textContent),
+			electricityTypeManufacturing: document.getElementById('electricityTypeManufacturing').value, // NEW
             water: parseFloat(document.getElementById('waterValue').textContent),
             manufacturingWaste: parseFloat(document.getElementById('manufacturingWasteValue').textContent),
             manufacturingTransport: parseFloat(document.getElementById('manufacturingTransportValue').textContent)
         };
 
         if (!validateInputs(inputs)) return;
+	   // Get electricity emission factor
+		const electricityEmissionFactor = electricityEmissionFactors[inputs.electricityTypeManufacturing]; // NEW
 
         // All inputs are already monthly
         const results = {
             Materials: inputs.rawMaterial * 1.8,
-            Energy: inputs.manufacturingEnergy * 0.02, //Everything except fuel
+            Energy: inputs.manufacturingEnergy * electricityEmissionFactor, //New
             Water: inputs.water * 0.01,
             Waste: inputs.manufacturingWaste * 0.8,
             Transport: inputs.manufacturingTransport * 0.26
@@ -546,6 +561,16 @@ async function exportToPDF() {
         if (typeof value === 'number') {
             displayText = `${key}: ${value.toFixed(2)}`;
         } else if (typeof value === 'string') {
+        // Handle electricity type
+        if (key === 'electricityTypePersonal' || key === 'electricityTypeConstruction' || key === 'electricityTypeManufacturing') {
+            const electricityTypes = {
+                'zesco': 'ZESCO (Grid)',
+                'solar': 'Solar',
+                'generator': 'Generator',
+                'hybrid': 'Hybrid'
+            };
+            displayText = `Electricity Type: ${electricityTypes[value] || value}`;
+        } else if (typeof value === 'string') {
             // Handle special cases for personal and open-air burning sections
             if (key === 'mealType') {
                 const mealTypes = {
@@ -821,6 +846,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
 
 
 
