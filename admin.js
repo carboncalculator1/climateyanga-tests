@@ -116,16 +116,15 @@ function formatCalculationInputs(inputs, type) {
                 };
                 displayValue = commuteTypes[value] || value;
             } else if (key === 'electricityTypePersonal') {
-            displayValue = `Electricity Source: ${electricityTypeLabels[value] || value}`;
-        }
-    } else if (type === 'construction') {
-        if (key === 'electricityTypeConstruction') {
-            displayValue = `Electricity Source: ${electricityTypeLabels[value] || value}`;
-        }
-    } else if (type === 'manufacturing') {
-        if (key === 'electricityTypeManufacturing') {
-            displayValue = `Electricity Source: ${electricityTypeLabels[value] || value}`;
-                }
+                displayValue = `Electricity Source: ${electricityTypeLabels[value] || value}`;
+            }
+        } else if (type === 'construction') {
+            if (key === 'electricityTypeConstruction') {
+                displayValue = `Electricity Source: ${electricityTypeLabels[value] || value}`;
+            }
+        } else if (type === 'manufacturing') {
+            if (key === 'electricityTypeManufacturing') {
+                displayValue = `Electricity Source: ${electricityTypeLabels[value] || value}`;
             }
         } else if (type === 'openair') {
             if (key === 'wasteType') {
@@ -152,15 +151,17 @@ function formatCalculationInputs(inputs, type) {
             continue; // Skip the regular display for waste object
         }
     
-            // Skip electricity type keys as we've already handled them above
-    if (key === 'electricityTypePersonal' || key === 'electricityTypeConstruction' || key === 'electricityTypeManufacturing') {
-        formatted += `${displayValue}\n`;
-    } else {
-        formatted += `${key.replace(/([A-Z])/g, ' $1').toUpperCase()}: ${displayValue}\n`;
+        // Skip electricity type keys as we've already handled them above
+        if (key === 'electricityTypePersonal' || key === 'electricityTypeConstruction' || key === 'electricityTypeManufacturing') {
+            formatted += `${displayValue}\n`;
+        } else {
+            formatted += `${key.replace(/([A-Z])/g, ' $1').toUpperCase()}: ${displayValue}\n`;
+        }
     }
     
     return formatted;
 }
+
 
 // Function to format calculation results for display
 function formatCalculationResults(results) {
