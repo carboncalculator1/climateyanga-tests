@@ -2,6 +2,8 @@
 let appointmentsModal;
 let appointmentsCloseBtn;
 
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // Check if user is admin
     auth.onAuthStateChanged(async (user) => {
@@ -62,6 +64,13 @@ window.addEventListener('click', function(event) {
   loadAppointments();
 });
 
+const electricityTypeLabels = {
+zesco: 'ZESCO (Grid)',
+solar: 'Solar',
+generator: 'Generator',
+hybrid: 'Hybrid'
+};
+
 const mealTypeLabels = {
     beef: 'Beef stew with nshima & vegetables',
     chicken: 'Chicken with rice & greens',
@@ -106,6 +115,17 @@ function formatCalculationInputs(inputs, type) {
                     'carElectric': 'Electrical Vehicle'
                 };
                 displayValue = commuteTypes[value] || value;
+            } else if (key === 'electricityTypePersonal') {
+            displayValue = `Electricity Source: ${electricityTypeLabels[value] || value}`;
+        }
+    } else if (type === 'construction') {
+        if (key === 'electricityTypeConstruction') {
+            displayValue = `Electricity Source: ${electricityTypeLabels[value] || value}`;
+        }
+    } else if (type === 'manufacturing') {
+        if (key === 'electricityTypeManufacturing') {
+            displayValue = `Electricity Source: ${electricityTypeLabels[value] || value}`;
+                }
             }
         } else if (type === 'openair') {
             if (key === 'wasteType') {
@@ -131,7 +151,11 @@ function formatCalculationInputs(inputs, type) {
             }
             continue; // Skip the regular display for waste object
         }
-        
+    
+            // Skip electricity type keys as we've already handled them above
+    if (key === 'electricityTypePersonal' || key === 'electricityTypeConstruction' || key === 'electricityTypeManufacturing') {
+        formatted += `${displayValue}\n`;
+    } else {
         formatted += `${key.replace(/([A-Z])/g, ' $1').toUpperCase()}: ${displayValue}\n`;
     }
     
@@ -366,6 +390,17 @@ async function viewCalculationDetails(userId, calcId) {
                     </table>
                 </div>`;
         }
+        // Add electricity type information to details
+    let electricityInfo = '';
+    if (calculation.inputs) {
+        const electricityType = calculation.inputs.electricityTypePersonal || 
+                              calculation.inputs.electricityTypeConstruction || 
+                              calculation.inputs.electricityTypeManufacturing;
+        if (electricityType) {
+            electricityInfo = `<p><strong>Electricity Source:</strong> ${electricityTypeLabels[electricityType] || electricityType}</p>`;
+        }
+    }
+
 
         const detailsHtml = `
             <div class="calculation-detail-card">
