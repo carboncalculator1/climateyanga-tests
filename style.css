@@ -1634,6 +1634,34 @@
   content: ":";
 }
 
+/* Add styling for electricity type dropdowns */
+.electricity-type-select {
+width: 100%;
+padding: 12px 15px;
+border: 1px solid #ced4da;
+border-radius: 8px;
+font-size: 1em;
+background-color: white;
+cursor: pointer;
+margin-top: 5px;
+}
+
+.electricity-type-select:focus {
+border-color: #28a745;
+outline: none;
+box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}
+
+/* Style for electricity type options */
+.electricity-type-select option {
+font-size: 1em;
+padding: 8px;
+}
+
+/* Add specific styling for electricity input groups */
+.input-group .electricity-type-select {
+margin-top: 8px;
+}
 
 
 
