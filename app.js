@@ -1,6 +1,28 @@
     let currentSection = 'personal';
     let calculationData = {};
 
+const studentEmissionFactors = {
+    transport: {
+        walking: 0,
+        bicycle: 0,
+        bus: 0.05,
+        carpool: 0.08,
+        public: 0.07,
+        car: 0.12
+    },
+    electricity: 0.02, // kg CO₂e per hour (average)
+    meals: 0.5, // kg CO₂e per meat meal
+    waste: 0.1, // kg CO₂e per item
+    digital: 0.02 // kg CO₂e per hour
+};
+
+const recyclingMultipliers = {
+    none: 1.0,
+    sometimes: 0.7,
+    often: 0.4,
+    always: 0.1
+};
+
 	const electricityEmissionFactors = {
 	zesco: 0.02, // kg CO₂e per kWh (Zambia grid average)
 	solar: 0.001, // kg CO₂e per kWh (solar PV)
@@ -368,6 +390,55 @@ function displayOpenAirResults(data) {
     document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
 }
 
+async function calculateStudent() {
+    const inputs = {
+        schoolName: document.getElementById('schoolName').value,
+        gradeLevel: document.getElementById('gradeLevel').value,
+        transportType: document.getElementById('studentTransportType').value,
+        commuteDistance: parseFloat(document.getElementById('studentCommuteValue').textContent),
+        electricityHours: parseFloat(document.getElementById('studentElectricityValue').textContent),
+        electricityType: document.getElementById('electricityTypeStudent').value,
+        meatMeals: parseFloat(document.getElementById('studentMealsValue').textContent),
+        recycling: document.getElementById('studentRecycling').value,
+        wasteItems: parseFloat(document.getElementById('studentWasteValue').textContent),
+        digitalHours: parseFloat(document.getElementById('studentDigitalValue').textContent)
+    };
+
+    // Create validation inputs (numeric only)
+    const validationInputs = {
+        commuteDistance: inputs.commuteDistance,
+        electricityHours: inputs.electricityHours,
+        meatMeals: inputs.meatMeals,
+        wasteItems: inputs.wasteItems,
+        digitalHours: inputs.digitalHours
+    };
+
+    if (!validateInputs(validationInputs)) return;
+
+    // Get electricity emission factor
+    const electricityEmissionFactor = electricityEmissionFactors[inputs.electricityType];
+
+    // Calculate emissions
+    const transportEmission = studentEmissionFactors.transport[inputs.transportType];
+    const recyclingMultiplier = recyclingMultipliers[inputs.recycling];
+
+    const results = {
+        Transport: inputs.commuteDistance * transportEmission * 22, // 22 school days per month
+        Electricity: inputs.electricityHours * electricityEmissionFactor * 30, // Daily to monthly
+        Food: inputs.meatMeals * studentEmissionFactors.meals * 4, // Weekly to monthly
+        Waste: inputs.wasteItems * studentEmissionFactors.waste * recyclingMultiplier * 4, // Weekly to monthly
+        Digital: inputs.digitalHours * studentEmissionFactors.digital * 30 // Daily to monthly
+    };
+
+    results.total = Object.values(results).reduce((sum, val) => sum + val, 0);
+    calculationData = { inputs, results };
+
+    // Save to Firestore
+    const saved = await saveCalculation(inputs, results, 'student');
+    
+    displayResults(results);
+}
+
 
 
     function displayResults(data) {
@@ -477,7 +548,35 @@ function displayOpenAirResults(data) {
         `;
         } else if (currentSection === 'openair') {
         displayOpenAirResults(data);
-    }
+    } else if (currentSection === 'student') {
+    summaryContainer.innerHTML = `
+        <div class="emissions-category">
+            <div class="category-name">Transport</div>
+            <div class="category-value">${data.Transport.toFixed(1)} kg CO₂e/month</div>
+            <div class="category-percentage">${((data.Transport / data.total) * 100).toFixed(1)}% of total</div>
+        </div>
+        <div class="emissions-category">
+            <div class="category-name">Electricity</div>
+            <div class="category-value">${data.Electricity.toFixed(1)} kg CO₂e/month</div>
+            <div class="category-percentage">${((data.Electricity / data.total) * 100).toFixed(1)}% of total</div>
+        </div>
+        <div class="emissions-category">
+            <div class="category-name">Food</div>
+            <div class="category-value">${data.Food.toFixed(1)} kg CO₂e/month</div>
+            <div class="category-percentage">${((data.Food / data.total) * 100).toFixed(1)}% of total</div>
+        </div>
+        <div class="emissions-category">
+            <div class="category-name">Waste</div>
+            <div class="category-value">${data.Waste.toFixed(1)} kg CO₂e/month</div>
+            <div class="category-percentage">${((data.Waste / data.total) * 100).toFixed(1)}% of total</div>
+        </div>
+        <div class="emissions-category">
+            <div class="category-name">Digital</div>
+            <div class="category-value">${data.Digital.toFixed(1)} kg CO₂e/month</div>
+            <div class="category-percentage">${((data.Digital / data.total) * 100).toFixed(1)}% of total</div>
+        </div>
+    `;
+}
 
 
         // Update total emissions (show in tonnes for annual total)
@@ -844,6 +943,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
 
 
 
