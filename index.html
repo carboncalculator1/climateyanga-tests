@@ -59,6 +59,10 @@
     			Open-Air Burning
 			</button>
         </div>
+	<button class="nav-btn" onclick="showSection('student')">
+    <i class="fas fa-graduation-cap"></i>
+    		Student
+			</button>
 
         <div id="personal" class="section active">
 						<!-- Transport control -->
@@ -515,6 +519,166 @@
     <button class="calculate-btn" onclick="calculateOpenAir()">
         <i class="fas fa-calculator"></i>
         Calculate Burning Emissions
+    </button>
+</div>
+
+<!-- Student section -->
+<div id="student" class="section">
+    <div class="input-group">
+        <label>
+            <i class="fas fa-school icon"></i>
+            School/University Name
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Enter your school or university name</span>
+            </span>
+        </label>
+        <input type="text" id="schoolName" placeholder="e.g., University of Zambia">
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-user-graduate icon"></i>
+            Grade/Year of Study
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Enter your grade level or year of study (optional)</span>
+            </span>
+        </label>
+        <input type="text" id="gradeLevel" placeholder="e.g., Grade 10 or Year 2">
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-bus icon"></i>
+            Transportation Type
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Select how you usually get to school</span>
+            </span>
+        </label>
+        <select id="studentTransportType" class="meal-type-select">
+            <option value="walking">🚶‍♂️ Walk</option>
+            <option value="bicycle">🚴‍♂️ Bicycle</option>
+            <option value="bus">🚌 School Bus</option>
+            <option value="carpool">👥 Carpool</option>
+            <option value="public">🚍 Public Transport</option>
+            <option value="car">🚗 Car (Personal)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-route icon"></i>
+            Daily Commute Distance (km)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Round-trip distance to school per day</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="50" value="5" step="0.5" oninput="updateSliderValue(this, 'studentCommuteValue')">
+            <span class="slider-value" id="studentCommuteValue">5</span>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-bolt icon"></i>
+            Daily Electricity Use (hours)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Average daily hours of electricity use for studying and gadgets</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="12" value="3" step="0.5" oninput="updateSliderValue(this, 'studentElectricityValue')">
+            <span class="slider-value" id="studentElectricityValue">3</span>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-plug icon"></i>
+            Electricity Source
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Select your primary electricity source</span>
+            </span>
+        </label>
+        <select id="electricityTypeStudent" class="meal-type-select">
+            <option value="zesco">ZESCO (Grid Power)</option>
+            <option value="solar">Solar</option>
+            <option value="generator">Generator</option>
+            <option value="hybrid">Hybrid (Grid + Solar)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-utensils icon"></i>
+            Meat-based Meals per Week
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Number of meals containing meat each week</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="21" value="7" step="1" oninput="updateSliderValue(this, 'studentMealsValue')">
+            <span class="slider-value" id="studentMealsValue">7</span>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-recycle icon"></i>
+            Recycling Habit
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">How often do you recycle?</span>
+            </span>
+        </label>
+        <select id="studentRecycling" class="meal-type-select">
+            <option value="none">Never</option>
+            <option value="sometimes">Sometimes</option>
+            <option value="often">Often</option>
+            <option value="always">Always</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-trash icon"></i>
+            Weekly Waste Items
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Approximate number of plastic bottles, wrappers, etc. disposed per week</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="50" value="10" step="1" oninput="updateSliderValue(this, 'studentWasteValue')">
+            <span class="slider-value" id="studentWasteValue">10</span>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-laptop icon"></i>
+            Daily Digital Usage (hours)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Daily hours spent on gaming, streaming, social media</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="10" value="2" step="0.5" oninput="updateSliderValue(this, 'studentDigitalValue')">
+            <span class="slider-value" id="studentDigitalValue">2</span>
+        </div>
+    </div>
+
+    <button class="calculate-btn" onclick="calculateStudent()">
+        <i class="fas fa-calculator"></i>
+        Calculate Student Emissions
     </button>
 </div>
 
