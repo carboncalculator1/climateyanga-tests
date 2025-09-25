@@ -91,6 +91,22 @@ const frequencyLabels = {
     monthly: 'Monthly'
 };
 
+const studentTransportLabels = {
+    walking: 'Walk',
+    bicycle: 'Bicycle',
+    bus: 'School Bus',
+    carpool: 'Carpool',
+    public: 'Public Transport',
+    car: 'Car (Personal)'
+};
+
+const recyclingLabels = {
+    none: 'Never',
+    sometimes: 'Sometimes',
+    often: 'Often',
+    always: 'Always'
+};
+
 // Function to format calculation inputs for display
 function formatCalculationInputs(inputs, type) {
     if (!inputs) return 'No inputs available';
@@ -134,7 +150,15 @@ function formatCalculationInputs(inputs, type) {
             }
         } else if (type === 'agriculture' && key === 'methaneCapture') {
             displayValue = value ? 'Yes' : 'No';
-        }
+        } else if (type === 'student') {
+                if (key === 'transportType') {
+                    displayValue = studentTransportLabels[value] || value;
+                } else if (key === 'recycling') {
+                    displayValue = recyclingLabels[value] || value;
+                } else if (key === 'electricityType') {
+                    displayValue = `Electricity Source: ${electricityTypeLabels[value] || value}`;
+                }
+            }
         
         // Format numeric values
         if (typeof value === 'number') {
