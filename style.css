@@ -82,7 +82,7 @@
 		/* hover states */
 		.facebook-btn:hover { opacity:0.95; transform: translateY(-1px); }
 		.gmail-btn:hover    { opacity:0.95; transform: translateY(-1px); }
-		..whatsapp-btn:hover    { opacity:0.95; transform: translateY(-1px); }
+		.whatsapp-btn:hover    { opacity:0.95; transform: translateY(-1px); }
 
 		
         /* General Styles */
@@ -1704,6 +1704,7 @@ padding: 8px;
 .input-group .electricity-type-select {
 margin-top: 8px;
 }
+
 
 
 
