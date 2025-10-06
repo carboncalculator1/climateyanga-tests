@@ -45,7 +45,7 @@
 		}
 
         /* common button styles */
-		.facebook-btn, .gmail-btn {
+		.facebook-btn, .gmail-btn, .whatsapp-btn {
   			display:inline-flex;
   			align-items:center;
   			gap:8px;
@@ -68,8 +68,13 @@
   			background: #D44638; /* Gmail red */
 		}
 
+		.whatsapp-btn {
+  			background: #25D366; /* Whatsapp green */
+		}
+
+
 		/* icon spacing */
-		.facebook-btn i, .gmail-btn i {
+		.facebook-btn i, .gmail-btn i, .whatsapp-btn i {
   			font-size:16px;
   			line-height:1;
 		}
@@ -77,6 +82,7 @@
 		/* hover states */
 		.facebook-btn:hover { opacity:0.95; transform: translateY(-1px); }
 		.gmail-btn:hover    { opacity:0.95; transform: translateY(-1px); }
+		..whatsapp-btn:hover    { opacity:0.95; transform: translateY(-1px); }
 
 		
         /* General Styles */
@@ -860,7 +866,7 @@
         @media (max-width: 480px) {
 
 			.footer-content { align-items:center; }
-  			.facebook-btn, .gmail-btn { padding:10px 14px; font-size:15px; }
+  			.facebook-btn, .gmail-btn, .whatsapp-btn { padding:10px 14px; font-size:15px; }
 
 			
             body {
@@ -1698,6 +1704,7 @@ padding: 8px;
 .input-group .electricity-type-select {
 margin-top: 8px;
 }
+
 
 
 
